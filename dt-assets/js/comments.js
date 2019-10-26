@@ -1,12 +1,12 @@
-/* global jQuery:false, moment:false, _:false, commentsSettings:false */
-const { __, _x, _n, _nx } = wp.i18n;
+/* global moment:false, _:false, commentsSettings:false */
 jQuery(document).ready(function($) {
 
   let commentPostedEvent = document.createEvent('Event');
   commentPostedEvent.initEvent('comment_posted', true, true);
 
-  let postId = $("#post-id").text()
-  let postType = $("#post-type").text()
+  let postId = window.detailsSettings.post_id
+  let postType = window.detailsSettings.post_type
+  let rest_api = window.API
 
   let comments = []
   let activity = [] // not guaranteed to be in any particular order
@@ -18,11 +18,12 @@ jQuery(document).ready(function($) {
         commentButton.toggleClass('loading')
         commentInput.attr("disabled", true)
         commentButton.attr("disabled", true)
-        API.post_comment(postType, postId, _.escape(comment_plain_text)).then(data => {
+        rest_api.post_comment(postType, postId, _.escape(comment_plain_text)).then(data => {
+          let updated_comment = data.comment || data
           commentInput.val("").trigger( "change" )
           commentButton.toggleClass('loading')
-          data.comment.date = moment(data.comment.comment_date_gmt + "Z")
-          comments.push(data.comment)
+          updated_comment.date = moment(updated_comment.comment_date_gmt + "Z")
+          comments.push(updated_comment)
           display_activity_comment()
           // fire comment posted event
           $('#content')[0].dispatchEvent(commentPostedEvent);
@@ -71,9 +72,9 @@ jQuery(document).ready(function($) {
         if (contactsDetailsWpApiSettings){
           field = _.get(contactsDetailsWpApiSettings, `contacts_custom_fields_settings[${item.meta_key}].name`)
         }
-        item.action = `<a class="revert-activity dt_tooltip" data-id="${item.histid}">
+        item.action = `<a class="revert-activity dt_tooltip" data-id="${_.escape( item.histid )}">
           <img class="revert-arrow-img" src="${commentsSettings.template_dir}/dt-assets/images/undo.svg">
-          <span class="tooltiptext">${field || item.meta_key} </span>
+          <span class="tooltiptext">${_.escape( field || item.meta_key )} </span>
         </a>`
       } else {
         item.action = ''
@@ -92,6 +93,10 @@ jQuery(document).ready(function($) {
     saveTabs()
   })
 
+  /* We use the CSS 'white-space:pre-wrap' and '<div dir=auto>' HTML elements
+   * to match the behaviour that the user sees when editing the comment in an
+   * input with dir=auto set, especially when using a right-to-left language
+   * with multiple paragraphs. */
   let commentTemplate = _.template(`
   <div class="activity-block">
     <div>
@@ -102,7 +107,7 @@ jQuery(document).ready(function($) {
     <div class="activity-text">
     <% _.forEach(activity, function(a){
         if (a.comment){ %>
-            <div dir="auto" class="comment-bubble <%- a.comment_ID %>" style="white-space: pre-line"> <%= a.text /* not escaped on purpose */ %> </div>
+            <div dir="auto" class="comment-bubble <%- a.comment_ID %>" style="white-space: pre-wrap"><div dir=auto><%= a.text.replace(/\\n/g, '</div><div dir=auto>') /* not escaped on purpose */ %></div></div>
             <p class="comment-controls">
                <% if ( a.comment_ID ) { %>
                   <a class="open-edit-comment" data-id="<%- a.comment_ID %>" style="margin-right:5px">
@@ -133,7 +138,7 @@ jQuery(document).ready(function($) {
   $('#confirm-comment-delete').on("click", function () {
     let id = $(this).data("id")
     $(this).toggleClass('loading')
-    API.delete_comment( postType, postId, id ).then(response=>{
+    rest_api.delete_comment( postType, postId, id ).then(response=>{
       $(this).toggleClass('loading')
       if (response){
         $('#delete-comment-modal').foundation('close')
@@ -168,9 +173,9 @@ jQuery(document).ready(function($) {
     $(this).toggleClass('loading')
     let id = $(this).data("id")
     let updated_comment = $('#comment-to-edit').val()
-    API.update_comment( postType, postId, id, updated_comment).then((response)=>{
+    rest_api.update_comment( postType, postId, id, updated_comment).then((response)=>{
       $(this).toggleClass('loading')
-      if (response === 1 || response === 0){
+      if (response === 1 || response === 0 || response.comment_ID){
         $('#edit-comment-modal').foundation('close')
       } else {
         $('.edit-comment.callout').show()
@@ -330,16 +335,16 @@ jQuery(document).ready(function($) {
       getActivityPromise.abort()
       getCommentsPromise.abort()
     }
-    getCommentsPromise =  API.get_comments(postType, postId)
-    getActivityPromise = API.get_activity(postType, postId)
+    getCommentsPromise =  rest_api.get_comments(postType, postId)
+    getActivityPromise = rest_api.get_activity(postType, postId)
     getAllPromise = $.when(
       getCommentsPromise,
       getActivityPromise
     )
     getAllPromise.then(function(commentDataStatusJQXHR, activityDataStatusJQXHR) {
       $("#comments-activity-spinner.loading-spinner").removeClass("active")
-      const commentData = commentDataStatusJQXHR[0];
-      const activityData = activityDataStatusJQXHR[0];
+      const commentData = commentDataStatusJQXHR[0].comments;
+      const activityData = activityDataStatusJQXHR[0].activity;
       prepareData(commentData, activityData)
     }).catch(err => {
       if ( !_.get( err, "statusText" ) === "abort" ) {
@@ -382,7 +387,7 @@ jQuery(document).ready(function($) {
     prepareActivityData(activity)
     display_activity_comment("all")
   }
-  prepareData( commentsSettings.comments, commentsSettings.activity )
+  prepareData( commentsSettings.comments.comments, commentsSettings.activity.activity )
 
 
   jQuery('#add-comment-button').on('click', function () {

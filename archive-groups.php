@@ -52,7 +52,7 @@ declare(strict_types=1);
             <span class="hide-for-small-only"><?php esc_html_e( "Filter groups", 'disciple_tools' ) ?></span>
         </a>
         <a class="button" style="margin-bottom:0" id="open-search">
-            <img style="display: inline-block;" src="<?php echo esc_html( get_template_directory_uri() . '/dt-assets/images/search.svg' ) ?>"/>
+            <img style="display: inline-block;" src="<?php echo esc_html( get_template_directory_uri() . '/dt-assets/images/search-white.svg' ) ?>"/>
             <span class="hide-for-small-only"><?php esc_html_e( "Search groups", 'disciple_tools' ) ?></span>
         </a>
         <div class="hideable-search" style="display: none; margin-top:5px">
@@ -169,9 +169,9 @@ declare(strict_types=1);
             </div>
             <div class="grid-x">
                 <div class="cell small-4 filter-modal-left">
-                    <?php $fields = [ "assigned_to", "created_on", "group_status", "group_type", "locations" ];
+                    <?php $fields = [ "assigned_to", "created_on", "group_status", "group_type", "location_grid" ];
                     $fields = apply_filters( 'dt_filters_additional_fields', $fields, "groups" );
-                    $allowed_types = [ "multi_select", "key_select", "boolean", "date" ];
+                    $allowed_types = [ "multi_select", "key_select", "boolean", "date", "location" ];
                     foreach ( $dt_group_field_options as $field_key => $field){
                         if ( in_array( $field["type"], $allowed_types ) && !in_array( $field_key, $fields ) && !( isset( $field["hidden"] ) && $field["hidden"] )){
                             $fields[] = $field_key;
@@ -179,6 +179,7 @@ declare(strict_types=1);
                     }
                     $connections = Disciple_Tools_Posts::$connection_types;
                     $connections["assigned_to"] = [ "name" => __( "Assigned To", 'disciple_tools' ) ];
+                    $connections["location_grid"] = [ "name" => __( "Locations", 'disciple_tools' ) ];
                     ?>
                     <ul class="vertical tabs" data-tabs id="filter-tabs">
                         <?php foreach ( $fields as $index => $field ) :

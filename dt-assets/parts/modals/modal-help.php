@@ -3,20 +3,38 @@
 
     <!--    Contact Status-->
     <div class="help-section" id="overall-status-help-text" style="display: none">
-        <h3><?php esc_html_e( "Contact Status", 'disciple_tools' ) ?></h3>
-        <p><?php esc_html_e( "This is where you set the current status of the contact.", 'disciple_tools' ) ?></p>
+        <?php
+        $field = Disciple_Tools_Contact_Post_Type::instance()->get_custom_fields_settings()["overall_status"]; ?>
+        <h3><?php echo esc_html( $field["name"] ) ?></h3>
+        <p><?php echo esc_html( $field["description"] ) ?></p>
         <ul>
-            <?php
-            $status_options = Disciple_Tools_Contact_Post_Type::instance()->get_custom_fields_settings()["overall_status"]["default"];
-            foreach ( $status_options as $option ): ?>
+            <?php foreach ( $field["default"] as $option ): ?>
                 <li><strong><?php echo esc_html( $option["label"] ) ?></strong> - <?php echo esc_html( $option["description"] ?? "" ) ?></li>
             <?php endforeach; ?>
         </ul>
     </div>
 
 
+    <div class="help-section" id="assigned-to-help-text" style="display: none">
+        <?php
+        $field = Disciple_Tools_Contact_Post_Type::instance()->get_custom_fields_settings()["assigned_to"]; ?>
+        <h3><?php echo esc_html( $field["name"] )?></h3>
+        <p><?php echo esc_html( $field["description"] ) ?></p>
+        <?php if ( current_user_can( "view_any_contacts" ) ) : ?>
+            <p><strong><?php esc_html_e( "Icons legend", 'disciple_tools' ) ?></strong></p>
+            <ul style="list-style-type:none">
+            <?php $workload_status_options = dt_get_site_custom_lists()["user_workload_status"] ?? [];
+            foreach ( $workload_status_options as $option_key =>$option_val ): ?>
+                <li><span style="background-color: <?php echo esc_html( $option_val["color"] ) ?>; height:10px; padding: 0 5px; border-radius: 2px">&nbsp;</span> <?php echo esc_html( $option_val["label"] ) ?></li>
+            <?php endforeach ?>
+                <li><img src="<?php echo esc_html( get_template_directory_uri() . '/dt-assets/images/broken.svg' )?>" /> 2: <?php esc_html_e( "2 contacts need an update", 'disciple_tools' ) ?> </li>
+            </ul>
+        <?php endif; ?>
+    </div>
+
+
     <div class="help-section" id="quick-action-help-text" style="display: none">
-        <h3 class="lead">Quick action buttons</h3>
+        <h3 class="lead"><?php esc_html_e( "Quick action buttons", 'disciple_tools' ) ?></h3>
         <p>These quick action buttons are here to aid you in updating the contact record.
         They track how many times each one has been used.</p>
         <p>They also update the "Seeker Path" below. For example,
@@ -69,27 +87,36 @@
         </ul>
     </div>
 
-    <!--  Group Parents and Children  -->
+    <!--  Group Parents, Peers and Children  -->
     <div class="help-section" id="group-connections-help-text" style="display: none">
-        <h3 class="lead"><?php esc_html_e( "Group Connections. Parent and Child Groups", 'disciple_tools' ) ?></h3>
-        <p>If this group has multiplied from another group, you can add that group here (Parent Group).</p>
-        <p>If this group has multiplied into another group, you can add that here (Child Groups).</p>
+        <h3 class="lead"><?php esc_html_e( "Group Connections. Parent, Peer and Child Groups", 'disciple_tools' ) ?></h3>
+        <p>Here you can select whether the group is a pre-group, group, church or team.</p>
+        <h4>Group Type:</h4>
+        <ul>
+            <li>Pre-group - a predominantly a non-believers group</li>
+            <li>Group - having 3 or more believers but not identifying as church</li>
+            <li>Church - having 3 or more believers and identifying as church</li>
+            <li>Team - a special group that is not meeting for or trying to become church).</li>
+        </ul>
+        <h4>Group Connections. Parent, Peer and Child Groups</h4>
+        <ul>
+            <li>Parent Group: The group that founded this group.</li>
+            <li>Peer Group: Related groups that aren’t parent/child in relationship. It might indicate groups that collaborate, are about to merge, recently split, etc.</li>
+            <li>Child Groups: A group that has been birthed out of this group.</li>
+        </ul>
     </div>
 
-    <!--    -->
-    <div class="help-section" id="-help-text" style="display: none">
-        <h3 class="lead"></h3>
-        <p></p>
+    <!--  Four Fields  -->
+    <div class="help-section" id="four-fields-help-text" style="display: none">
+        <h3 class="lead"><?php esc_html_e( "Four Fields", 'disciple_tools' ) ?></h3>
+        <ul>
+            <li>Unbeliever field: Unbelievers in this group.</li>
+            <li>Believer field: Believers in this group.</li>
+            <li>Accountable field.</li>
+            <li>Church field: Is this a church?</li>
+            <li>Multiply field: How many members of multiplying?</li>
+        </ul>
     </div>
-
-    <!--    -->
-    <div class="help-section" id="-help-text" style="display: none">
-        <h3 class="lead"></h3>
-        <p></p>
-    </div>
-
-
-
 
     <div class="grid-x">
         <button class="button" data-close aria-label="Close reveal" type="button">

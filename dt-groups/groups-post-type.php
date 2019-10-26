@@ -102,6 +102,7 @@ class Disciple_Tools_Groups_Post_Type
         add_action( 'init', [ $this, 'register_post_type' ] );
         add_action( 'init', [ $this, 'groups_rewrites_init' ] );
         add_filter( 'post_type_link', [ $this, 'groups_permalink' ], 1, 3 );
+        add_filter( 'dt_get_post_type_settings', [ $this, 'get_post_type_settings_hook' ], 10, 2 );
 
         if ( is_admin() ) {
             global $pagenow;
@@ -323,6 +324,33 @@ class Disciple_Tools_Groups_Post_Type
             "customizable" => "add_only"
         ];
 
+        /* 4 fields */
+        $fields["four_fields_unbelievers"] = [
+            'name' => __( 'Unbelievers', 'disciple_tools' ),
+            'type' => 'text',
+            'default' => ''
+        ];
+        $fields["four_fields_believers"] = [
+            'name' => __( 'Believers', 'disciple_tools' ),
+            'type' => 'text',
+            'default' => ''
+        ];
+        $fields["four_fields_accountable"] = [
+            'name' => __( 'Accountable', 'disciple_tools' ),
+            'type' => 'text',
+            'default' => ''
+        ];
+        $fields["four_fields_church_commitment"] = [
+            'name' => __( 'Church Commitment', 'disciple_tools' ),
+            'type' => 'text',
+            'default' => ''
+        ];
+        $fields["four_fields_multiplying"] = [
+            'name' => __( 'Multiplying', 'disciple_tools' ),
+            'type' => 'text',
+            'default' => ''
+        ];
+
         $fields['start_date'] = [
             'name'        => __( 'Start Date', 'disciple_tools' ),
             'description' => '',
@@ -370,14 +398,57 @@ class Disciple_Tools_Groups_Post_Type
             'type' => 'text',
             'default' => ''
         ];
-        $fields["locations"] = [
-            "name" => __( "Locations", "disciple_tools" ),
-            "type" => "connection"
+        $fields["parent_groups"] = [
+            "name" => __( "Parents", "disciple_tools" ),
+            "type" => "connection",
+            "p2p_direction" => "from",
+            "p2p_key" => "groups_to_groups"
+        ];
+        $fields["child_groups"] = [
+            "name" => __( "Child", "disciple_tools" ),
+            "type" => "connection",
+            "p2p_direction" => "to",
+            "p2p_key" => "groups_to_groups"
+        ];
+        $fields["peer_groups"] = [
+            "name" => __( "Peer Groups", "disciple_tools" ),
+            "type" => "connection",
+            "p2p_direction" => "any",
+            "p2p_key" => "groups_to_peers"
+        ];
+        $fields["members"] = [
+            "name" => __( "Members", "disciple_tools" ),
+            "type" => "connection",
+            "p2p_direction" => "to",
+            "p2p_key" => "contacts_to_groups"
+        ];
+        $fields["people_groups"] = [
+            "name" => __( "People Groups", "disciple_tools" ),
+            "type" => "connection",
+            "p2p_direction" => "from",
+            "p2p_key" => "groups_to_peoplegroups"
+        ];
+        $fields["leaders"] = [
+            "name" => __( "Leaders", "disciple_tools" ),
+            "type" => "connection",
+            "p2p_direction" => "from",
+            "p2p_key" => "groups_to_leaders"
+        ];
+        $fields["coaches"] = [
+            "name" => __( "Group Coach / Church Planter", "disciple_tools" ),
+            "type" => "connection",
+            "p2p_direction" => "from",
+            "p2p_key" => "groups_to_coaches"
         ];
         $fields["requires_update"] = [
             'name'        => __( 'Requires Update', 'disciple_tools' ),
             'type'        => 'boolean',
             'default'     => false,
+        ];
+        $fields['location_grid'] = [
+            'name'        => __( 'Locations', 'disciple_tools' ),
+            'type'        => 'location',
+            'default'     => [],
         ];
 
 
@@ -407,10 +478,16 @@ class Disciple_Tools_Groups_Post_Type
      * @param bool $include_current_post
      * @param int|null $post_id
      * @param bool $with_deleted_options
+     * @param bool $load_from_cache
      *
      * @return mixed
      */
-    public function get_custom_fields_settings( $include_current_post = true, int $post_id = null, $with_deleted_options = false ) {
+    public function get_custom_fields_settings( $include_current_post = true, int $post_id = null, $with_deleted_options = false, $load_from_cache = true ) {
+        $cached = wp_cache_get( "group_fields_settings" );
+        if ( $load_from_cache && $cached ){
+            return $cached;
+        }
+
         $fields = $this->get_group_field_defaults( $post_id, $include_current_post );
         $fields = apply_filters( 'dt_custom_fields_settings', $fields, "groups" );
         foreach ( $fields as $field_key => $field ){
@@ -438,7 +515,7 @@ class Disciple_Tools_Groups_Post_Type
                         }
                         if ( $field_type === "key_select" || $field_type === "multi_select" ){
                             if ( isset( $field["default"] )){
-                                $fields[$key]["default"] = array_merge( $fields[$key]["default"], $field["default"] );
+                                $fields[$key]["default"] = array_replace_recursive( $fields[$key]["default"], $field["default"] );
                             }
                         }
                     }
@@ -461,14 +538,14 @@ class Disciple_Tools_Groups_Post_Type
             foreach ( $fields as $field_key => $field ){
                 if ( $field["type"] === "key_select" || $field["type"] === "multi_select" ){
                     foreach ( $field["default"] as $option_key => $option_value ){
-                        if ( isset( $option_value["deleted"] ) && $option_value["deleted"] === true ){
+                        if ( isset( $option_value["deleted"] ) && $option_value["deleted"] == true ){
                             unset( $fields[$field_key]["default"][$option_key] );
                         }
                     }
                 }
             }
         }
-
+        wp_cache_set( "group_fields_settings", $fields );
         return $fields;
     } // End get_custom_fields_settings()
 
@@ -527,6 +604,32 @@ class Disciple_Tools_Groups_Post_Type
 
     public function groups_rewrites_init() {
         add_rewrite_rule( 'groups/([0-9]+)?$', 'index.php?post_type=groups&p=$matches[1]', 'top' );
+    }
+
+    public function get_channels_list(){
+        return [
+            "address" => [
+                "label" => __( "Address", 'disciple_tools' ),
+            ]
+        ];
+    }
+
+    public function get_post_type_settings_hook( $settings, $post_type ){
+        if ( $post_type === "groups" ){
+            $fields = $this->get_custom_fields_settings();
+            $settings = [
+                'fields' => $fields,
+                'address_types' => dt_address_metabox()->get_address_type_list( "groups" ),
+                'channels' => $this->get_channels_list(),
+                'connection_types' => array_keys( array_filter( $fields, function ( $a ) {
+                    return $a["type"] === "connection";
+                } ) ),
+                'label_singular' => $this->singular,
+                'label_plural' => $this->plural,
+                'post_type' => 'groups'
+            ];
+        }
+        return $settings;
     }
 
 

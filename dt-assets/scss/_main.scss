@@ -209,6 +209,9 @@ nav.second-bar {
         font-weight: 800;
         font-size:1.3rem;
     }
+    ul.is-at-top {
+        padding-top: 10px;
+    }
 }
 
 
@@ -484,6 +487,7 @@ button.loader{
     border: .25rem solid #919191;
     border-top-color: black;
     animation: spin 1s infinite linear;
+    display: inline-block;
 }
 
 
@@ -542,6 +546,10 @@ button.loader{
             padding: 1px;
         }
     }
+}
+
+.avatar img {
+    height: 16px;
 }
 
 .clearfix {
@@ -775,4 +783,72 @@ html[dir='rtl'] {
         margin:5px;
     }
 }
+
+#metrics-sidemenu ul.menu.vertical.nested {
+    display:none;
+}
 /* End Metrics section */
+
+
+.drill_down {
+    margin-bottom: 0;
+    list-style-type: none;
+}
+.drill_down li {
+    display:inline;
+    margin-right: 3px;
+}
+.drill_down li select {
+    width: 150px;
+}
+
+/**
+ * Switch
+ */
+input.dt-switch[type=checkbox] {
+    height: 0;
+    width: 0;
+    visibility: hidden;
+    display: none;
+}
+label.dt-switch {
+    cursor: pointer;
+    text-indent: -9999px;
+    width: 41px;
+    height: 20px;
+    background: grey;
+    display: inline-block;
+    border-radius: 100px;
+    position: relative;
+    margin: 0;
+}
+label.dt-switch:after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 90px;
+    transition: 0.3s;
+}
+
+input.dt-switch:checked + label {
+    background: #3f729b;
+}
+
+input.dt-switch:checked + label:after {
+    left: calc(100% - 3px);
+    transform: translateX(-100%);
+}
+
+label.dt-switch:active:after {
+    width: 20px;
+}
+
+
+.ul-no-bullets {
+    list-style-type: none;
+    margin: 0;
+}

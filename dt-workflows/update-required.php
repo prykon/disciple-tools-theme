@@ -38,6 +38,10 @@ class Disciple_Tools_Update_Needed_Async extends Disciple_Tools_Async_Task {
         $update_needed_settings = $site_options["update_required"];
         if ( $update_needed_settings["enabled"] === true ) {
             wp_set_current_user( 0 ); // to keep the update needed notifications from coming from a specific user.
+            $current_user = wp_get_current_user();
+            $current_user->add_cap( "access_contacts" );
+            $current_user->add_cap( "view_any_contacts" );
+            $current_user->add_cap( "update_any_contacts" );
             foreach ( $update_needed_settings["options"] as $setting ) {
                 $date                 = time() - $setting["days"] * 24 * 60 * 60; // X days in seconds
                 $contacts_need_update = $wpdb->get_results( $wpdb->prepare( "
@@ -60,9 +64,12 @@ class Disciple_Tools_Update_Needed_Async extends Disciple_Tools_Async_Task {
                     esc_sql( $setting["seeker_path"] )
                 ), OBJECT );
                 foreach ( $contacts_need_update as $contact ) {
-                    $user_name    = ( "@" . dt_get_user_display_name( $contact->ID ) . " " ) ?? "";
+                    $user_name    = ( "@" . dt_get_assigned_name( $contact->ID, true ) . " " ) ?? "";
                     $comment_html = esc_html( $user_name . $setting["comment"] );
-                    Disciple_Tools_Contacts::add_comment( $contact->ID, $comment_html, "comment", [ "user_id" => 0 ], false, true );
+                    Disciple_Tools_Contacts::add_comment( $contact->ID, $comment_html, "comment", [
+                        "user_id" => 0,
+                        "comment_author" => __( "Updated Needed", 'disciple_tools' )
+                    ], false, true );
                     Disciple_Tools_contacts::update_contact( $contact->ID, [ "requires_update" => true ], false );
                 }
             }
@@ -75,6 +82,7 @@ class Disciple_Tools_Update_Needed_Async extends Disciple_Tools_Async_Task {
         if ( $group_update_needed_settings["enabled"] === true ) {
             wp_set_current_user( 0 ); // to keep the update needed notifications from coming from a specific user.
             $current_user = wp_get_current_user();
+            $current_user->add_cap( "access_groups" );
             $current_user->add_cap( "view_any_groups" );
             $current_user->add_cap( "update_any_groups" );
 
@@ -95,7 +103,7 @@ class Disciple_Tools_Update_Needed_Async extends Disciple_Tools_Async_Task {
                     $date
                 ), OBJECT );
                 foreach ( $groups_need_update as $group ) {
-                    $user_name    = ( "@" . dt_get_user_display_name( $group->ID ) . " " ) ?? "";
+                    $user_name    = ( "@" . dt_get_assigned_name( $group->ID, true ) . " " ) ?? "";
                     $comment_html = esc_html( $user_name . $setting["comment"] );
                     Disciple_Tools_Groups::add_comment( $group->ID, $comment_html, "updated_needed", [
                         "user_id" => 0,

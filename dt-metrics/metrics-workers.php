@@ -77,17 +77,21 @@ class Disciple_Tools_Metrics_Users extends Disciple_Tools_Metrics_Hooks_Base
     }
 
     public function refresh_pace( WP_REST_Request $request ) {
+        $query_params = $request->get_query_params();
+        $force = isset( $query_params["force"] ) && $query_params["force"] === "1";
         if ( !$this->has_permission() ){
             return new WP_Error( "refresh_pace", "Missing Permissions", [ 'status' => 400 ] );
         }
-        return $this->get_workers_data( true );
+        return $this->get_workers_data( $force );
     }
 
-    public function workers_pace() {
+    public function workers_pace( WP_REST_Request $request ) {
+        $query_params = $request->get_query_params();
+        $force = isset( $query_params["force"] ) && $query_params["force"] === "1";
         if ( ! $this->has_permission() ){
             return new WP_Error( "workers_pace", "Missing Permissions", [ 'status' => 400 ] );
         }
-        return $this->get_workers_data();
+        return $this->get_workers_data( $force );
     }
 
     public function contact_progress_per_worker() {
@@ -114,9 +118,9 @@ class Disciple_Tools_Metrics_Users extends Disciple_Tools_Metrics_Hooks_Base
         $content .= '
             <li><a href="">' .  esc_html__( 'Workers', 'disciple_tools' ) . '</a>
                 <ul class="menu vertical nested" id="workers-menu" aria-expanded="true">
-                    <li><a href="'. site_url( '/metrics/workers/' ) .'#workers_activity" onclick="workers_activity()">'. esc_html__( 'Activity' ) .'</a></li>
-                    <li><a href="'. site_url( '/metrics/workers/' ) .'#follow_up_pace" onclick="show_follow_up_pace()">'. esc_html__( 'Overall Pace' ) .'</a></li>
-                    <li><a href="'. site_url( '/metrics/workers/' ) .'#contact_follow_up_pace" onclick="contact_follow_up_pace()">'. esc_html__( 'Follow-up Pace' ) .'</a></li>
+                    <li><a href="'. site_url( '/metrics/workers/' ) .'#workers_activity" onclick="workers_activity()">'. esc_html__( 'Activity', 'disciple_tools' ) .'</a></li>
+                    <li><a href="'. site_url( '/metrics/workers/' ) .'#follow_up_pace" onclick="show_follow_up_pace()">'. esc_html__( 'Overall Pace', 'disciple_tools' ) .'</a></li>
+                    <li><a href="'. site_url( '/metrics/workers/' ) .'#contact_follow_up_pace" onclick="contact_follow_up_pace()">'. esc_html__( 'Follow-up Pace', 'disciple_tools' ) .'</a></li>
                 </ul>
             </li>
             ';
@@ -124,19 +128,20 @@ class Disciple_Tools_Metrics_Users extends Disciple_Tools_Metrics_Hooks_Base
     }
 
     public function scripts() {
-        wp_enqueue_script( 'dt_metrics_workers_script', get_stylesheet_directory_uri() . '/dt-metrics/metrics-workers.js', [
+        wp_enqueue_script( 'dt_metrics_workers_script', get_template_directory_uri() . '/dt-metrics/metrics-workers.js', [
             'jquery',
             'jquery-ui-core',
+            'amcharts-core',
+            'amcharts-charts',
         ], filemtime( get_theme_file_path() . '/dt-metrics/metrics-workers.js' ), true );
 
         wp_localize_script(
             'dt_metrics_workers_script', 'dtMetricsUsers', [
                 'root' => esc_url_raw( rest_url() ),
-                'theme_uri' => get_stylesheet_directory_uri(),
+                'theme_uri' => get_template_directory_uri(),
                 'nonce' => wp_create_nonce( 'wp_rest' ),
                 'current_user_login' => wp_get_current_user()->user_login,
                 'current_user_id' => get_current_user_id(),
-                'map_key' => dt_get_option( 'map_key' ),
                 'data' => $this->workers(),
             ]
         );
@@ -144,6 +149,8 @@ class Disciple_Tools_Metrics_Users extends Disciple_Tools_Metrics_Hooks_Base
 
     public function workers() {
         return [
+            'hero_stats' => $this->chart_user_hero_stats(),
+            'recent_activity' => $this->chart_recent_activity(),
             'translations' => [
                 'title_activity' => __( 'Workers Activity', 'disciple_tools' ),
                 'title_recent_activity' => __( 'Worker System Engagement for the Last 30 Days', 'disciple_tools' ),
@@ -159,8 +166,6 @@ class Disciple_Tools_Metrics_Users extends Disciple_Tools_Metrics_Hooks_Base
                 'label_select_year' => __( 'Select All time or a specific year to display', 'disciple_tools' ),
                 'label_all_time' => __( 'All time', 'disciple_tools' ),
             ],
-            'hero_stats' => $this->chart_user_hero_stats(),
-            'recent_activity' => $this->chart_recent_activity(),
         ];
     }
 
@@ -184,7 +189,6 @@ class Disciple_Tools_Metrics_Users extends Disciple_Tools_Metrics_Hooks_Base
 
     public function chart_recent_activity() {
         $chart = [];
-        $chart[] = [ 'Year', 'Worker Logins' ];
 
         $results = Disciple_Tools_Queries::instance()->query( 'recent_unique_logins' );
         if ( empty( $results ) ) {
@@ -210,14 +214,17 @@ class Disciple_Tools_Metrics_Users extends Disciple_Tools_Metrics_Hooks_Base
                 }
             }
 
-            $chart[] = [ date( 'M d', strtotime( $day ) ), (int) $total ];
+            $chart[] = [
+                'date' => date( 'M d', strtotime( $day ) ),
+                'value' => (int) $total
+            ];
         }
 
         return $chart;
     }
 
     public function chart_contact_progress_per_worker( $force_refresh = false ) {
-//        $force_refresh = true; // for testing
+        $force_refresh = true; // for testing
 
         if ( $force_refresh ) {
             delete_transient( 'chart_contact_progress_per_worker' );
@@ -227,10 +234,12 @@ class Disciple_Tools_Metrics_Users extends Disciple_Tools_Metrics_Hooks_Base
         }
         $chart = [];
 
-        $chart[] = [ 'Name', 'Assigned', 'Accepted', 'Active', 'Attempt Needed', 'Attempted', 'Established', 'Meet Scheduled', 'Meet Complete', 'Ongoing Meeting', 'Baptisms', 'Coaching' ];
+        $chart[] = [ 'Name', 'Last Update', 'Assigned', 'Accepted', 'Active', 'Attempt Needed', 'Attempted', 'Established', 'Meet Scheduled', 'Meet Complete', 'Ongoing Meeting', 'Baptisms', 'Coaching' ];
 
         $results = Disciple_Tools_Queries::instance()->query( 'contact_progress_per_worker' );
         $baptized = Disciple_Tools_Queries::instance()->query( 'baptized_per_worker' );
+        $activity = Disciple_Tools_Queries::instance()->query( 'last_update_per_worker' );
+
         $worker_ids = get_users( [
             'role__in' => [ 'multiplier','dispatcher','dt_admin','strategist','Administrator' ],
             'fields' => 'ID'
@@ -265,8 +274,18 @@ class Disciple_Tools_Metrics_Users extends Disciple_Tools_Metrics_Hooks_Base
                 }
             }
 
+            $last_activity = "";
+            if ( !empty( $activity ) ){
+                foreach ( $activity as $user_activity ){
+                    if ( $user_activity["user_id"] == $result["user_id"] ){
+                        $last_activity = dt_format_date( $user_activity["last_update"] );
+                    }
+                }
+            }
+
             $chart[] = [
                 $user->display_name,
+                $last_activity,
                 (int) $result['assigned'],
                 (int) $result['accepted'],
                 (int) $result['active'],
@@ -281,7 +300,7 @@ class Disciple_Tools_Metrics_Users extends Disciple_Tools_Metrics_Hooks_Base
             ];
         }
 
-        set_transient( 'chart_contact_progress_per_worker', maybe_serialize( $chart ), strtotime( 'tomorrow' ) );
+        set_transient( 'chart_contact_progress_per_worker', maybe_serialize( $chart ), 60 * 60 * 24 );
 
         return $chart;
     }
@@ -385,7 +404,7 @@ class Disciple_Tools_Metrics_Users extends Disciple_Tools_Metrics_Hooks_Base
           'timestamp' => current_time( 'timestamp' ),
         ];
 
-        set_transient( 'chart_user_pace', $response, strtotime( 'tomorrow' ) );
+        set_transient( 'chart_user_pace', $response, 60 * 60 * 24 );
 
         return $response;
     }
@@ -408,6 +427,7 @@ class Disciple_Tools_Metrics_Users extends Disciple_Tools_Metrics_Hooks_Base
                 count(new_assigned.post_id) as number_new_assigned,
                 count(update_needed.post_id) as number_update
             from $wpdb->users as users
+            INNER JOIN $wpdb->usermeta as um on ( um.user_id = users.ID AND um.meta_key = 'wp_capabilities' AND um.meta_value LIKE '%multiplier%' )
             INNER JOIN $wpdb->postmeta as pm on (pm.meta_key = 'assigned_to' and pm.meta_value = CONCAT( 'user-', users.ID ) )
             INNER JOIN $wpdb->postmeta as type on (type.post_id = pm.post_id and type.meta_key = 'type' and ( type.meta_value = 'media' OR type.meta_value = 'next_gen' ) )
             LEFT JOIN $wpdb->postmeta as met on (met.post_id = type.post_id and met.meta_key = 'seeker_path' and ( met.meta_value = 'met' OR met.meta_value = 'ongoing' OR met.meta_value = 'coaching' ) )
@@ -421,9 +441,9 @@ class Disciple_Tools_Metrics_Users extends Disciple_Tools_Metrics_Hooks_Base
             SELECT users.ID,
                 MAX(date_assigned.hist_time) as last_date_assigned
             from $wpdb->users as users
+            INNER JOIN $wpdb->usermeta as um on ( um.user_id = users.ID AND um.meta_key = 'wp_capabilities' AND um.meta_value LIKE '%multiplier%' )
             INNER JOIN $wpdb->postmeta as pm on (pm.meta_key = 'assigned_to' and pm.meta_value = CONCAT( 'user-', users.ID ) )
-            INNER JOIN $wpdb->postmeta as type on (type.post_id = pm.post_id and type.meta_key = 'type' and ( type.meta_value = 'media' OR type.meta_value = 'next_gen' ) )
-            INNER JOIN $wpdb->dt_activity_log as date_assigned on ( date_assigned.meta_key = 'overall_status' and date_assigned.object_type = 'contacts' AND date_assigned.object_id = type.post_id AND date_assigned.meta_value = 'assigned' )
+            INNER JOIN $wpdb->dt_activity_log as date_assigned on ( date_assigned.meta_key = 'overall_status' and date_assigned.object_type = 'contacts' AND date_assigned.object_id = pm.post_id AND date_assigned.meta_value = 'assigned' )
             GROUP by users.ID",
         ARRAY_A);
 
@@ -493,7 +513,7 @@ class Disciple_Tools_Metrics_Users extends Disciple_Tools_Metrics_Hooks_Base
             "timestamp" => current_time( "mysql" ),
         ];
 
-        set_transient( 'get_workers_data', maybe_serialize( $return ), strtotime( 'tomorrow' ) );
+        set_transient( 'get_workers_data', maybe_serialize( $return ), 60 * 60 * 24 );
 
         return $return;
     }

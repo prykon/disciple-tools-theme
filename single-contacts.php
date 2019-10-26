@@ -6,7 +6,7 @@ if ( ! current_user_can( 'access_contacts' ) ) {
 }
 
 ( function () {
-    $contact = Disciple_Tools_Contacts::get_contact( get_the_ID(), true );
+    $contact = Disciple_Tools_Contacts::get_contact( get_the_ID(), true, true );
     $contact_fields = Disciple_Tools_Contacts::get_contact_fields();
 
     if (isset( $_POST['unsure_all'] ) && isset( $_POST['dt_contact_nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['dt_contact_nonce'] ) ) ) {
@@ -62,16 +62,15 @@ if ( ! current_user_can( 'access_contacts' ) ) {
             );
 
             foreach ( $contact as $key => $fields ) {
-                if ( strpos( $key, "contact_" ) === false ) {
-                    continue;
-                }
-                $split = explode( "_", $key );
-                if ( !isset( $split[1] ) ) {
-                    continue;
-                }
-                $new_key = $split[0] . "_" . $split[1];
-                foreach ( $contact[ $new_key ] ?? array() as $values ) {
-                    $current[ $new_key ][ $values['key'] ] = $values['value'];
+                if ( strpos( $key, "contact_" ) === 0 ) {
+                    $split = explode( "_", $key );
+                    if ( !isset( $split[1] ) ) {
+                        continue;
+                    }
+                    $new_key = $split[0] . "_" . $split[1];
+                    foreach ( $contact[ $new_key ] ?? array() as $values ) {
+                        $current[ $new_key ][ $values['key'] ] = $values['value'];
+                    }
                 }
             }
 
@@ -113,7 +112,7 @@ if ( ! current_user_can( 'access_contacts' ) ) {
                         $update[$key]["values"][] = [ "value" => $field_value ];
                     }
                 }
-                if ( isset( $contact_fields[$key] ) && $contact_fields[$key]["type"] === "key_select" && !isset( $contact[$key] )){
+                if ( isset( $contact_fields[ $key ] ) && $contact_fields[ $key ]["type"] === "key_select" && ( !isset( $contact[ $key ] ) || $key === "none" || $key === "" ) ) {
                     $update[$key] = $fields["key"];
                 }
                 if ( isset( $contact_fields[$key] ) && $contact_fields[$key]["type"] === "text" && ( !isset( $contact[$key] ) || empty( $contact[$key] ) )){
@@ -131,29 +130,28 @@ if ( ! current_user_can( 'access_contacts' ) ) {
                     }
                 }
 
-                if ( strpos( $key, "contact_" ) === false ) {
-                    continue;
-                }
-                $split = explode( "_", $key );
-                if ( !isset( $split[1] ) ) {
-                    continue;
-                }
-                $new_key = $split[0] . "_" . $split[1];
-                if ( in_array( $new_key, array_keys( $update ) ) ) {
-                    continue;
-                }
-                $update[ $new_key ] = array(
-                    'values' => array()
-                );
-                foreach ( $non_master[ $new_key ] ?? array() as $values ) {
-                    $index = array_search( $values['value'], $current[ $new_key ] ?? array() );
-                    if ( $index !== false ) {
-                        $ignore_keys[] = $index;
+                if ( strpos( $key, "contact_" ) === 0 ) {
+                    $split = explode( "_", $key );
+                    if ( !isset( $split[1] ) ) {
                         continue;
                     }
-                    array_push( $update[ $new_key ]['values'], array(
-                        'value' => $values['value']
-                    ) );
+                    $new_key = $split[0] . "_" . $split[1];
+                    if ( in_array( $new_key, array_keys( $update ) ) ) {
+                        continue;
+                    }
+                    $update[ $new_key ] = array(
+                        'values' => array()
+                    );
+                    foreach ( $non_master[ $new_key ] ?? array() as $values ) {
+                        $index = array_search( $values['value'], $current[ $new_key ] ?? array() );
+                        if ( $index !== false ) {
+                            $ignore_keys[] = $index;
+                            continue;
+                        }
+                        array_push( $update[ $new_key ]['values'], array(
+                            'value' => $values['value']
+                        ) );
+                    }
                 }
             }
 
@@ -166,6 +164,7 @@ if ( ! current_user_can( 'access_contacts' ) ) {
                 Disciple_Tools_Contacts::remove_fields( $master_id, $delete_fields, $ignore_keys );
             }
 
+//            @todo return error if update fails
             Disciple_Tools_Contacts::update_contact( $master_id, $update, true );
             Disciple_Tools_Contacts::merge_p2p( $master_id, $non_master_id );
             Disciple_Tools_Contacts::copy_comments( $master_id, $non_master_id );
@@ -191,7 +190,7 @@ if ( ! current_user_can( 'access_contacts' ) ) {
 
     <?php
     $current_user_id = get_current_user_id();
-    $following = Disciple_Tools_Posts::get_users_following_post( "contacts", get_the_ID() );
+    $following = DT_Posts::get_users_following_post( "contacts", get_the_ID() );
     $dispatcher_actions = [];
     if ( current_user_can( "create_users" )){
         $dispatcher_actions[] = "make_user_from_contact";
@@ -210,7 +209,7 @@ if ( ! current_user_can( 'access_contacts' ) ) {
         $dispatcher_actions
     ); ?>
 
-    <div id="errors"></div>
+<!--    <div id="errors"></div>-->
 
     <div id="content">
         <span id="contact-id" style="display: none"><?php echo get_the_ID()?></span>
@@ -335,7 +334,7 @@ if ( ! current_user_can( 'access_contacts' ) ) {
                                         </button>
                                     </div>
 
-                                    <select class="select-field" id="seeker_path" style="margin-bottom: 0px">
+                                    <select class="select-field" id="seeker_path" style="margin-bottom: 0">
                                     <?php
 
                                     foreach ($contact_fields["seeker_path"]["default"] as $key => $option){
@@ -377,7 +376,9 @@ if ( ! current_user_can( 'access_contacts' ) ) {
                                     <div class="baptism_date">
                                         <div class="section-subheader"><?php esc_html_e( 'Baptism Date', 'disciple_tools' )?></div>
                                         <div class="baptism_date">
-                                            <input type="text" data-date-format='yy-mm-dd' value="<?php echo esc_html( $contact["baptism_date"]["formatted"] ?? '' )?>" id="baptism-date-picker">
+                                            <input type="text" class="dt_date_picker"
+                                                   value="<?php echo esc_html( $contact["baptism_date"]["formatted"] ?? '' )?>"
+                                                   id="baptism_date">
                                         </div>
                                     </div>
 
@@ -581,43 +582,6 @@ if ( ! current_user_can( 'access_contacts' ) ) {
         </button>
     </div>
 
-    <div class="reveal" id="edit-reason-modal" data-reveal>
-
-
-        <div class="medium-6 cell reason-field">
-            <?php
-            $status = $contact['overall_status']['key'] ?? '';
-            $has_status = isset( $contact_fields["reason_$status"]['name'] );
-            ?>
-            <div class="section-subheader">
-                <?php
-                if ( $has_status ) {
-                    echo esc_html( $contact_fields["reason_$status"]['name'] );
-                }
-                ?>
-            </div>
-            <?php
-            $status_style = !$has_status ? 'display:none;' : '';
-            $reason_field = $has_status ? "reason_$status" : '';
-            ?>
-            <select class="status-reason" style="<?php echo esc_html( $status_style ); ?>" data-field="<?php echo esc_html( $reason_field ) ?>">
-                <?php
-                if ( $has_status ) {
-                    foreach ( $contact_fields["reason_$status"]['default'] as $reason_key => $reason_label ) { ?>
-                        <option value="<?php echo esc_attr( $reason_key ) ?>"
-                            <?php
-                            $selected = $contact["reason_$status"]['key'] ?? '' === $reason_key ? 'selected' : '';
-                            echo esc_html( $selected ); ?>>
-                            <?php echo esc_html( $reason_label['label'] ?? "" ); ?>
-                        </option>
-                        <?php
-                    }
-                }
-                ?>
-            </select>
-        </div>
-    </div>
-
     <div class="reveal" id="create-tag-modal" data-reveal data-reset-on-close>
 
         <p class="lead"><?php esc_html_e( 'Create Tag', 'disciple_tools' )?></p>
@@ -762,7 +726,7 @@ if ( ! current_user_can( 'access_contacts' ) ) {
         <div class="confirm-merge-with-user" style="display: none">
             <p><?php esc_html_e( "To finish the linking, merge this contact with the existing user details.", 'disciple_tools' ) ?></p>
         </div>
-        
+
         <?php endif; ?>
 
         <div class="grid-x">
@@ -835,7 +799,7 @@ if ( ! current_user_can( 'access_contacts' ) ) {
     <?php
 } )();
 
-if (isset( $_POST['merge'] ) && wp_verify_nonce( $_POST['dt_contact_nonce'] ?? null ) ) {
+if ( isset( $_POST['merge'], $_POST['dt_contact_nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['dt_contact_nonce'] ) ) ?? null ) ) {
     echo "<script type='text/javascript'>$(document).ready(function() { $('#merge-dupe-modal').click(); });</script>";
 }
 

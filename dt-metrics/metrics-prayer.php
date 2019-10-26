@@ -44,7 +44,7 @@ class Disciple_Tools_Metrics_Prayer extends Disciple_Tools_Metrics_Hooks_Base
     }
 
     public function scripts() {
-        wp_enqueue_script( 'dt_metrics_prayer_script', get_stylesheet_directory_uri() . '/dt-metrics/metrics-prayer.js', [
+        wp_enqueue_script( 'dt_metrics_prayer_script', get_template_directory_uri() . '/dt-metrics/metrics-prayer.js', [
             'jquery',
             'jquery-ui-core',
         ], filemtime( get_theme_file_path() . '/dt-metrics/metrics-prayer.js' ), true );
@@ -52,11 +52,10 @@ class Disciple_Tools_Metrics_Prayer extends Disciple_Tools_Metrics_Hooks_Base
         wp_localize_script(
             'dt_metrics_prayer_script', 'dtMetricsPrayer', [
                 'root' => esc_url_raw( rest_url() ),
-                'theme_uri' => get_stylesheet_directory_uri(),
+                'theme_uri' => get_template_directory_uri(),
                 'nonce' => wp_create_nonce( 'wp_rest' ),
                 'current_user_login' => wp_get_current_user()->user_login,
                 'current_user_id' => get_current_user_id(),
-                'map_key' => dt_get_option( 'map_key' ),
                 'data' => $this->data(),
             ]
         );
@@ -68,7 +67,6 @@ class Disciple_Tools_Metrics_Prayer extends Disciple_Tools_Metrics_Hooks_Base
                 'title_1' => __( 'Prayer Lists', 'disciple_tools' ),
                 'title_2' => __( 'Praises for Steps Taken', 'disciple_tools' ),
                 'title_3' => __( 'Requests for Next Steps Needed', 'disciple_tools' ),
-                'label_counties' => __( 'Counties', 'disciple_tools' ),
             ],
         ];
     }
