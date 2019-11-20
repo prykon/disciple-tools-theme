@@ -666,7 +666,7 @@ class Disciple_Tools_Mapping_Queries {
 
 
     /**
-     * Count post types, churchs and groups in each used location and accross admin levels
+     * Count post types, churches and groups in each used location and across admin levels
      */
     public static function get_location_grid_totals() : array {
 
@@ -678,9 +678,9 @@ class Disciple_Tools_Mapping_Queries {
 
         $results = $wpdb->get_results("
             SELECT
-              t1.admin0_grid_id as grid_id,
-              t1.type,
-              count(t1.admin0_grid_id) as count
+                t1.admin0_grid_id as grid_id,
+                t1.type,
+                count(t1.admin0_grid_id) as count
             FROM (
                 SELECT
                     g.admin0_grid_id,
@@ -694,17 +694,19 @@ class Disciple_Tools_Mapping_Queries {
                     LEFT JOIN $wpdb->dt_location_grid as g ON g.grid_id=p.meta_value             
                     LEFT JOIN $wpdb->postmeta as cu ON cu.post_id=p.post_id AND cu.meta_key = 'corresponds_to_user'
                     LEFT JOIN $wpdb->postmeta as gt ON gt.post_id=p.post_id AND gt.meta_key = 'group_type'
+                    LEFT JOIN $wpdb->postmeta as sample ON p.post_id = sample.post_id AND sample.meta_key = '_sample'
                 WHERE p.meta_key = 'location_grid'
+                    AND sample.meta_value IS NULL
             ) as t1
             WHERE t1.admin0_grid_id != ''
             GROUP BY t1.admin0_grid_id, t1.type
             UNION
             SELECT
-              t2.admin1_grid_id as grid_id,
-              t2.type,
-              count(t2.admin1_grid_id) as count
+                t2.admin1_grid_id as grid_id,
+                t2.type,
+                count(t2.admin1_grid_id) as count
             FROM (
-                    SELECT
+                SELECT
                     g.admin1_grid_id,
                     CASE
                     	WHEN gt.meta_value = 'church' THEN 'churches'
@@ -716,17 +718,19 @@ class Disciple_Tools_Mapping_Queries {
                     LEFT JOIN $wpdb->dt_location_grid as g ON g.grid_id=p.meta_value             
                     LEFT JOIN $wpdb->postmeta as cu ON cu.post_id=p.post_id AND cu.meta_key = 'corresponds_to_user'
                     LEFT JOIN $wpdb->postmeta as gt ON gt.post_id=p.post_id AND gt.meta_key = 'group_type'
+                    LEFT JOIN $wpdb->postmeta as sample ON p.post_id = sample.post_id AND sample.meta_key = '_sample'
                 WHERE p.meta_key = 'location_grid'
+                    AND sample.meta_value IS NULL
             ) as t2
             WHERE t2.admin1_grid_id != ''
             GROUP BY t2.admin1_grid_id, t2.type
             UNION
             SELECT
-              t3.admin2_grid_id as grid_id,
-              t3.type,
-              count(t3.admin2_grid_id) as count
+                t3.admin2_grid_id as grid_id,
+                t3.type,
+                count(t3.admin2_grid_id) as count
             FROM (
-                    SELECT
+                SELECT
                     g.admin2_grid_id,
                     CASE
                     	WHEN gt.meta_value = 'church' THEN 'churches'
@@ -738,17 +742,19 @@ class Disciple_Tools_Mapping_Queries {
                     LEFT JOIN $wpdb->dt_location_grid as g ON g.grid_id=p.meta_value             
                     LEFT JOIN $wpdb->postmeta as cu ON cu.post_id=p.post_id AND cu.meta_key = 'corresponds_to_user'
                     LEFT JOIN $wpdb->postmeta as gt ON gt.post_id=p.post_id AND gt.meta_key = 'group_type'
+                    LEFT JOIN $wpdb->postmeta as sample ON p.post_id = sample.post_id AND sample.meta_key = '_sample'
                 WHERE p.meta_key = 'location_grid'
+                    AND sample.meta_value IS NULL
             ) as t3
             WHERE t3.admin2_grid_id != ''
             GROUP BY t3.admin2_grid_id, t3.type
             UNION
             SELECT
-              t4.admin3_grid_id as grid_id,
-              t4.type,
-              count(t4.admin3_grid_id) as count
+                t4.admin3_grid_id as grid_id,
+                t4.type,
+                count(t4.admin3_grid_id) as count
             FROM (
-                    SELECT
+                SELECT
                     g.admin3_grid_id,
                     CASE
                     	WHEN gt.meta_value = 'church' THEN 'churches'
@@ -760,7 +766,9 @@ class Disciple_Tools_Mapping_Queries {
                     LEFT JOIN $wpdb->dt_location_grid as g ON g.grid_id=p.meta_value             
                     LEFT JOIN $wpdb->postmeta as cu ON cu.post_id=p.post_id AND cu.meta_key = 'corresponds_to_user'
                     LEFT JOIN $wpdb->postmeta as gt ON gt.post_id=p.post_id AND gt.meta_key = 'group_type'
+                    LEFT JOIN $wpdb->postmeta as sample ON p.post_id = sample.post_id AND sample.meta_key = '_sample'
                 WHERE p.meta_key = 'location_grid'
+                    AND sample.meta_value IS NULL
             ) as t4
             WHERE t4.admin3_grid_id != ''
             GROUP BY t4.admin3_grid_id, t4.type;
@@ -785,27 +793,30 @@ class Disciple_Tools_Mapping_Queries {
         }
 
         $results = $wpdb->get_results("
+            SELECT
+                admin0_grid_id as grid_id,
+                type,
+                count(admin0_grid_id) as count
+            FROM (
                 SELECT
-                  admin0_grid_id as grid_id,
-                  type,
-                  count(admin0_grid_id) as count
-                FROM (
-                        SELECT
-                        g.admin0_grid_id,
-                        CASE
-                            WHEN gt.meta_value = 'church' THEN 'churches'
-                            WHEN cu.meta_value IS NOT NULL THEN 'users'
-                            ELSE pp.post_type
-                        END as type
-                    FROM $wpdb->postmeta as p
-                        JOIN $wpdb->posts as pp ON p.post_id=pp.ID
-                        LEFT JOIN $wpdb->dt_location_grid as g ON g.grid_id=p.meta_value             
-                        LEFT JOIN $wpdb->postmeta as cu ON cu.post_id=p.post_id AND cu.meta_key = 'corresponds_to_user'
-                        LEFT JOIN wp_postmeta as gt ON gt.post_id=p.post_id AND gt.meta_key = 'group_type'
-                    WHERE p.meta_key = 'location_grid' AND g.admin0_grid_id != ''
-                ) as t1
-                GROUP BY admin0_grid_id, type
-            ", ARRAY_A );
+                    g.admin0_grid_id,
+                    CASE
+                        WHEN gt.meta_value = 'church' THEN 'churches'
+                        WHEN cu.meta_value IS NOT NULL THEN 'users'
+                        ELSE pp.post_type
+                    END as type
+                FROM $wpdb->postmeta as p
+                    JOIN $wpdb->posts as pp ON p.post_id=pp.ID
+                    LEFT JOIN $wpdb->dt_location_grid as g ON g.grid_id=p.meta_value             
+                    LEFT JOIN $wpdb->postmeta as cu ON cu.post_id=p.post_id AND cu.meta_key = 'corresponds_to_user'
+                    LEFT JOIN wp_postmeta as gt ON gt.post_id=p.post_id AND gt.meta_key = 'group_type'
+                    LEFT JOIN $wpdb->postmeta as sample ON p.post_id = sample.post_id AND sample.meta_key = '_sample'
+                WHERE p.meta_key = 'location_grid' 
+                    AND g.admin0_grid_id != ''
+                    AND sample.meta_value IS NULL
+            ) as t1
+            GROUP BY admin0_grid_id, type
+        ", ARRAY_A );
 
 
         if ( empty( $results ) ) {

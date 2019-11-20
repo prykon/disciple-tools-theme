@@ -717,25 +717,32 @@ class Disciple_Tools_Snapshot_Report {
         ];
 
         // Add types and status
-        $users = count_users();
+        global $wpdb;
+        $users = $wpdb->get_results( $wpdb->prepare( "
+            SELECT meta_value FROM $wpdb->usermeta
+			INNER JOIN $wpdb->users ON user_id = ID AND user_email NOT LIKE %s
+			WHERE meta_key = %s
+        ", '%disciple.tools%', $wpdb->prefix . 'capabilities' ), ARRAY_A );
 
-        $data['total_users'] = (int) $users['total_users'];
-
-        foreach ( $users['avail_roles'] as $role => $count ) {
-            if ( $role === 'marketer' ) {
-                $data['roles']['responders'] = $data['roles']['responders'] + $count;
-            }
-            if ( $role === 'dispatcher' ) {
-                $data['roles']['dispatchers'] = $data['roles']['dispatchers'] + $count;
-            }
-            if ( $role === 'multiplier' ) {
-                $data['roles']['multipliers'] = $data['roles']['multipliers'] + $count;
-            }
-            if ( $role === 'administrator' || $role === 'dt_admin' ) {
-                $data['roles']['admins'] = $data['roles']['admins'] + $count;
-            }
-            if ( $role === 'strategist' ) {
-                $data['roles']['strategists'] = $data['roles']['strategists'] + $count;
+        $data['total_users'] = sizeof( $users );
+        foreach ( $users as $meta ){
+            $capabilities = maybe_unserialize( $meta["meta_value"] );
+            foreach ( $capabilities as $role => $val ) {
+                if ( $role === 'marketer' ) {
+                    $data['roles']['responders']++;
+                }
+                if ( $role === 'dispatcher' ) {
+                    $data['roles']['dispatchers']++;
+                }
+                if ( $role === 'multiplier' ) {
+                    $data['roles']['multipliers']++;
+                }
+                if ( $role === 'administrator' || $role === 'dt_admin' ) {
+                    $data['roles']['admins']++;
+                }
+                if ( $role === 'strategist' ) {
+                    $data['roles']['strategists']++;
+                }
             }
         }
 

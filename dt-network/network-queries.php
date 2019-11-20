@@ -8,24 +8,29 @@ class Disciple_Tools_Network_Queries {
          * Returns status and count of contacts according to the overall status
          * return array
          */
-        $results = $wpdb->get_results("
-                SELECT
-                  b.meta_value as status,
-                  count(a.ID) as count
-                FROM $wpdb->posts as a
-                  JOIN $wpdb->postmeta as b
-                    ON a.ID = b.post_id
-                       AND b.meta_key = 'overall_status'
-                WHERE a.post_status = 'publish'
-                      AND a.post_type = 'contacts'
-                      AND a.ID NOT IN (
-                  SELECT bb.post_id
-                  FROM $wpdb->postmeta as bb
-                  WHERE meta_key = 'corresponds_to_user'
-                        AND meta_value != 0
-                  GROUP BY bb.post_id )
-                GROUP BY b.meta_value
-            ", ARRAY_A );
+        $results = $wpdb->get_results( "
+            SELECT
+                b.meta_value as status,
+                count(a.ID) as count
+            FROM $wpdb->posts as a
+            JOIN $wpdb->postmeta as b
+                ON a.ID = b.post_id
+                AND b.meta_key = 'overall_status'
+            LEFT JOIN $wpdb->postmeta as sample
+                ON a.ID = sample.post_id
+                AND sample.meta_key = '_sample'
+            WHERE a.post_status = 'publish'
+                AND a.post_type = 'contacts'
+                AND sample.meta_value IS NULL
+                AND a.ID NOT IN (
+                    SELECT bb.post_id
+                    FROM $wpdb->postmeta as bb
+                    WHERE meta_key = 'corresponds_to_user'
+                    AND meta_value != 0
+                    GROUP BY bb.post_id
+                )
+            GROUP BY b.meta_value
+        ", ARRAY_A );
 
         if ( empty( $results ) ) {
             $results = [];
@@ -41,18 +46,23 @@ class Disciple_Tools_Network_Queries {
          * return int
          */
         $results = $wpdb->get_var("
-                    SELECT
-                      count(a.ID) as count
-                    FROM $wpdb->posts as a
-                    WHERE a.post_status = 'publish'
-                          AND a.post_type = 'contacts'
-                          AND a.ID NOT IN (
-                      SELECT bb.post_id
-                      FROM $wpdb->postmeta as bb
-                      WHERE meta_key = 'corresponds_to_user'
-                            AND meta_value != 0
-                      GROUP BY bb.post_id )
-                ");
+            SELECT
+                count(a.ID) as count
+            FROM $wpdb->posts as a
+            LEFT JOIN $wpdb->postmeta as sample
+                ON a.ID = sample.post_id
+                AND sample.meta_key = '_sample'
+            WHERE a.post_status = 'publish'
+                AND a.post_type = 'contacts'
+                AND sample.meta_value IS NULL
+                AND a.ID NOT IN (
+                    SELECT bb.post_id
+                    FROM $wpdb->postmeta as bb
+                    WHERE meta_key = 'corresponds_to_user'
+                    AND meta_value != 0
+                    GROUP BY bb.post_id
+                )
+        ");
         if ( empty( $results ) ) {
             $results = 0;
         }
@@ -66,12 +76,16 @@ class Disciple_Tools_Network_Queries {
          * return int
          */
         $results = $wpdb->get_var("
-                    SELECT
-                      count(a.ID) as count
-                    FROM $wpdb->posts as a
-                    WHERE a.post_status = 'publish'
-                          AND a.post_type = 'groups'
-                ");
+            SELECT
+                count(a.ID) as count
+            FROM $wpdb->posts as a
+            LEFT JOIN $wpdb->postmeta as sample
+                ON a.ID = sample.post_id
+                AND sample.meta_key = '_sample'
+            WHERE a.post_status = 'publish'
+                AND a.post_type = 'groups'
+                AND sample.meta_value IS NULL
+        ");
         if ( empty( $results ) ) {
             $results = 0;
         }
@@ -97,25 +111,29 @@ class Disciple_Tools_Network_Queries {
          *
          */
         $results = $wpdb->get_results( "
-                    SELECT
-                      d.meta_value           as category,
-                      count(distinct (a.ID)) as practicing
-                    FROM $wpdb->posts as a
-                      JOIN $wpdb->postmeta as c
-                        ON a.ID = c.post_id
-                           AND c.meta_key = 'group_status'
-                           AND c.meta_value = 'active'
-                      JOIN $wpdb->postmeta as d
-                        ON a.ID = d.post_id
-                            AND d.meta_key = 'health_metrics'
-                      JOIN $wpdb->postmeta as e
-                        ON a.ID = e.post_id
-                           AND e.meta_key = 'group_type'
-                            AND ( e.meta_value = 'group' OR e.meta_value = 'church')
-                    WHERE a.post_status = 'publish'
-                          AND a.post_type = 'groups'
-                    GROUP BY d.meta_value;
-                ", ARRAY_A );
+            SELECT
+                d.meta_value           as category,
+                count(distinct (a.ID)) as practicing
+            FROM $wpdb->posts as a
+            JOIN $wpdb->postmeta as c
+                ON a.ID = c.post_id
+                    AND c.meta_key = 'group_status'
+                    AND c.meta_value = 'active'
+            JOIN $wpdb->postmeta as d
+                ON a.ID = d.post_id
+                    AND d.meta_key = 'health_metrics'
+            JOIN $wpdb->postmeta as e
+                ON a.ID = e.post_id
+                    AND e.meta_key = 'group_type'
+                    AND ( e.meta_value = 'group' OR e.meta_value = 'church')
+            LEFT JOIN $wpdb->postmeta as sample
+                ON a.ID = sample.post_id
+                AND sample.meta_key = '_sample'
+            WHERE a.post_status = 'publish'
+                AND a.post_type = 'groups'
+                AND sample.meta_value IS NULL
+            GROUP BY d.meta_value;
+        ", ARRAY_A );
 
         if ( empty( $results ) ) {
             $results = [];
@@ -131,14 +149,13 @@ class Disciple_Tools_Network_Queries {
          * Returns count for number of unique users signed in within the last month.
          */
         $results = $wpdb->get_var("
-                    SELECT
-                      COUNT( DISTINCT object_id ) as value
-                    FROM $wpdb->dt_activity_log
-                    WHERE
-                      object_type = 'user'
-                      AND action = 'logged_in'
-                      AND hist_time >= UNIX_TIMESTAMP(CURDATE() - INTERVAL 1 MONTH );
-                ");
+            SELECT
+                COUNT( DISTINCT object_id ) as value
+            FROM $wpdb->dt_activity_log
+            WHERE object_type = 'user'
+                AND action = 'logged_in'
+                AND hist_time >= UNIX_TIMESTAMP(CURDATE() - INTERVAL 1 MONTH )
+        ");
 
         if ( empty( $results ) ) {
             $results = 0;
@@ -162,18 +179,22 @@ class Disciple_Tools_Network_Queries {
          *
          */
         $results = $wpdb->get_results( $wpdb->prepare( "
-                    SELECT
-                      from_unixtime( hist_time , '%%Y-%%m') as date,
-                      count( DISTINCT object_id) as value
-                    FROM $wpdb->dt_activity_log
-                    WHERE object_type = %s
-                      AND action = %s
-                      AND hist_time != ''
-                      AND hist_time REGEXP ('^[0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
-                    GROUP BY date
-                    ORDER BY date DESC
-                    LIMIT 25;
-                ",
+            SELECT
+                from_unixtime( hist_time , '%%Y-%%m') as date,
+                count( DISTINCT object_id) as value
+            FROM $wpdb->dt_activity_log
+            LEFT JOIN $wpdb->postmeta as sample
+                ON object_id = sample.post_id
+                AND sample.meta_key = '_sample'
+            WHERE object_type = %s
+                AND sample.meta_value IS NULL
+                AND action = %s
+                AND hist_time != ''
+                AND hist_time REGEXP ('^[0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
+            GROUP BY date
+            ORDER BY date DESC
+            LIMIT 25;
+        ",
             $object_type,
             $action
         ), ARRAY_A );
@@ -200,18 +221,22 @@ class Disciple_Tools_Network_Queries {
          *
          */
         $results = $wpdb->get_results( $wpdb->prepare( "
-                    SELECT
-                      from_unixtime( hist_time , '%%Y-%%m-%%d') as date,
-                      count( DISTINCT object_id) as value
-                    FROM $wpdb->dt_activity_log
-                    WHERE object_type = %s
-                          AND action = %s
-                          AND hist_time != ''
-                          AND hist_time REGEXP ('^[0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
-                    GROUP BY date
-                    ORDER BY date DESC
-                    LIMIT 60;
-                ",
+        SELECT
+            from_unixtime( hist_time , '%%Y-%%m-%%d') as date,
+            count( DISTINCT object_id) as value
+            FROM $wpdb->dt_activity_log
+            LEFT JOIN $wpdb->postmeta as sample
+                ON object_id = sample.post_id
+                AND sample.meta_key = '_sample'
+            WHERE object_type = %s
+                AND sample.meta_value IS NULL
+                AND action = %s
+                AND hist_time != ''
+                AND hist_time REGEXP ('^[0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
+            GROUP BY date
+            ORDER BY date DESC
+            LIMIT 60;
+        ",
             $object_type,
             $action
         ), ARRAY_A );
@@ -235,15 +260,18 @@ class Disciple_Tools_Network_Queries {
          *   2018-04-27     39
          */
         $results = $wpdb->get_var( "
-                   SELECT
-                      count( DISTINCT object_id) as value
-                    FROM $wpdb->dt_activity_log
-                    WHERE 
-                        object_type = 'contacts'
-                        AND object_subtype = 'baptism_date'
-                        AND meta_value != ''
-                        AND meta_value REGEXP ('^[0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
-                " );
+            SELECT
+                count( DISTINCT object_id) as value
+            FROM $wpdb->dt_activity_log log
+            LEFT JOIN $wpdb->postmeta as sample
+                ON log.object_id = sample.post_id
+                AND sample.meta_key = '_sample'
+            WHERE log.object_type = 'contacts'
+                AND sample.meta_value IS NULL
+                AND log.object_subtype = 'baptism_date'
+                AND log.meta_value != ''
+                AND log.meta_value REGEXP ('^[0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
+        " );
         if ( empty( $results ) ) {
             $results = 0;
         } else {
@@ -268,18 +296,22 @@ class Disciple_Tools_Network_Queries {
          *
          */
         $results = $wpdb->get_results( "
-                    SELECT
-                      from_unixtime( meta_value , '%Y-%m') as date,
-                      count( DISTINCT object_id) as value
-                    FROM $wpdb->dt_activity_log
-                    WHERE object_type = 'contacts'
-                      AND object_subtype = 'baptism_date'
-                      AND meta_value != ''
-                      AND meta_value REGEXP ('^[0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
-                    GROUP BY meta_value
-                    ORDER BY date DESC
-                    LIMIT 25;
-                ", ARRAY_A );
+            SELECT
+                from_unixtime( log.meta_value , '%Y-%m') as date,
+                count( DISTINCT object_id) as value
+            FROM $wpdb->dt_activity_log log
+            LEFT JOIN $wpdb->postmeta as sample
+                ON log.object_id = sample.post_id
+                AND sample.meta_key = '_sample'
+            WHERE object_type = 'contacts'
+                AND sample.meta_value IS NULL
+                AND log.object_subtype = 'baptism_date'
+                AND log.meta_value != ''
+                AND log.meta_value REGEXP ('^[0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
+            GROUP BY log.meta_value
+            ORDER BY date DESC
+            LIMIT 25;
+        ", ARRAY_A );
 
         if ( empty( $results ) ) {
             $results = [];
@@ -300,18 +332,22 @@ class Disciple_Tools_Network_Queries {
          *   2018-04-27     39
          */
         $results = $wpdb->get_results( "
-               SELECT
-                  from_unixtime( meta_value , '%Y-%m-%d') as date,
-                  count( DISTINCT object_id) as value
-                FROM $wpdb->dt_activity_log
-                WHERE object_type = 'contacts'
-                AND object_subtype = 'baptism_date'
-                AND meta_value != ''
-                AND meta_value REGEXP ('^[0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
-                GROUP BY meta_value
-                ORDER BY date DESC
-                LIMIT 60;
-            ", ARRAY_A );
+            SELECT
+                from_unixtime( log.meta_value , '%Y-%m-%d') as date,
+                count( DISTINCT object_id) as value
+            FROM $wpdb->dt_activity_log log
+            LEFT JOIN $wpdb->postmeta as sample
+                ON log.object_id = sample.post_id
+                AND sample.meta_key = '_sample'
+            WHERE object_type = 'contacts'
+                AND sample.meta_value IS NULL
+                AND log.object_subtype = 'baptism_date'
+                AND log.meta_value != ''
+                AND log.meta_value REGEXP ('^[0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
+            GROUP BY log.meta_value
+            ORDER BY date DESC
+            LIMIT 60;
+        ", ARRAY_A );
 
         if ( empty( $results ) ) {
             $results = [];
@@ -334,22 +370,26 @@ class Disciple_Tools_Network_Queries {
         church      inactive    2
          */
         $results = $wpdb->get_results( "
-                    SELECT
-                      c.meta_value as type,
-                      b.meta_value as status,
-                      count(a.ID)  as count
-                    FROM $wpdb->posts as a
-                      JOIN $wpdb->postmeta as b
-                        ON a.ID = b.post_id
-                           AND b.meta_key = 'group_status'
-                      JOIN $wpdb->postmeta as c
-                        ON a.ID = c.post_id
-                           AND c.meta_key = 'group_type'
-                    WHERE a.post_status = 'publish'
-                          AND a.post_type = 'groups'
-                    GROUP BY type, status
-                    ORDER BY type ASC
-                ", ARRAY_A );
+            SELECT
+                c.meta_value as type,
+                b.meta_value as status,
+                count(a.ID)  as count
+            FROM $wpdb->posts as a
+            JOIN $wpdb->postmeta as b
+                ON a.ID = b.post_id
+                    AND b.meta_key = 'group_status'
+            JOIN $wpdb->postmeta as c
+                ON a.ID = c.post_id
+                    AND c.meta_key = 'group_type'
+            LEFT JOIN $wpdb->postmeta as sample
+                ON a.ID = sample.post_id
+                AND sample.meta_key = '_sample'
+            WHERE a.post_status = 'publish'
+                AND a.post_type = 'groups'
+                AND sample.meta_value IS NULL
+            GROUP BY type, status
+            ORDER BY type ASC
+        ", ARRAY_A );
 
         if ( empty( $results ) ) {
             $results = [];
@@ -366,20 +406,24 @@ class Disciple_Tools_Network_Queries {
          * return int
          */
         $results = $wpdb->get_var("
-                    SELECT
-                      count(a.ID) as count
-                    FROM $wpdb->posts as a
-                    JOIN $wpdb->postmeta as c
-                        ON a.ID = c.post_id
-                           AND c.meta_key = 'group_status'
-                           AND c.meta_value = 'active'
-                    JOIN $wpdb->postmeta as b 
-                      ON a.ID=b.post_id
-                      AND b.meta_key = 'group_type'
-                      AND ( b.meta_value = 'group' OR b.meta_value = 'church' )
-                    WHERE a.post_status = 'publish'
-                      AND a.post_type = 'groups'
-                ");
+            SELECT
+                count(a.ID) as count
+            FROM $wpdb->posts as a
+            JOIN $wpdb->postmeta as c
+                ON a.ID = c.post_id
+                    AND c.meta_key = 'group_status'
+                    AND c.meta_value = 'active'
+            JOIN $wpdb->postmeta as b 
+                ON a.ID=b.post_id
+                AND b.meta_key = 'group_type'
+                AND ( b.meta_value = 'group' OR b.meta_value = 'church' )
+            LEFT JOIN $wpdb->postmeta as sample
+                ON a.ID = sample.post_id
+                AND sample.meta_key = '_sample'
+            WHERE a.post_status = 'publish'
+                AND a.post_type = 'groups'
+                AND sample.meta_value IS NULL
+        ");
 
         if ( empty( $results ) ) {
             $results = 0;
