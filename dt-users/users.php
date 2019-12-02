@@ -331,6 +331,7 @@ class Disciple_Tools_Users
         ];
         $contacts = new WP_Query( $args );
         if ( isset( $contacts->post->ID ) ){
+            update_user_option( $user_id, "corresponds_to_contact", $contacts->post->ID );
             return $contacts->post->ID;
         } else {
             return null;

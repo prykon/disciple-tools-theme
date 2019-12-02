@@ -540,7 +540,7 @@ class Disciple_Tools_Contact_Post_Type
             'section' => 'misc'
         ];
         $fields["type"] = [
-            'name'        => __( 'Contact type', 'disciple_tools' ),
+            'name'        => __( 'Contact Type', 'disciple_tools' ),
             'description' => __( 'Type of contact', 'disciple_tools' ),
             'type'        => 'key_select',
             'default'     => [
@@ -548,9 +548,10 @@ class Disciple_Tools_Contact_Post_Type
                 'next_gen' => [ "label" => __( 'Next Generation', 'disciple_tools' ) ],
                 'user'     => [ "label" => __( 'User', 'disciple_tools' ) ],
                 'partner'  => [ "label" => __( 'Partner', 'disciple_tools' ) ],
+                'oikos' => [ "label" => "Oikos" ]
             ],
             'section'     => 'misc',
-            'hidden'      => true
+//            'hidden'      => true
         ];
         $fields["last_modified"] =[
             'name' => __( 'Last modified', 'disciple_tools' ),

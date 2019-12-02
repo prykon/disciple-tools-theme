@@ -95,6 +95,18 @@ get_header();
                     <textarea name="initial_comment" dir="auto" placeholder="<?php esc_html_e( "Initial comment", "disciple_tools" ); ?>"></textarea>
                 </label>
 
+                    Contact type
+                    <br>
+                <label>
+                    <input type="radio" name="type" value="access" required><strong><?php esc_html_e( 'Access', 'disciple_tools' ); ?></strong>&nbsp;-&nbsp;<span><?php esc_html_e( 'From media, websites, camps or events', 'disciple_tools' ); ?></span> <br>
+                </label>
+                <label>
+                    <input type="radio" name="type" value="oikos"><strong><?php esc_html_e( 'Oikos', 'disciple_tools' ); ?></strong>&nbsp;-&nbsp;<span><?php esc_html_e( 'People you personally know or personal connection to existing contacts.', 'disciple_tools' ); ?></span> <br>
+                </label>
+<!--                <label>-->
+<!--                    <input type="radio" name="type" value="oikos"><strong>--><?php //esc_html_e( 'User', 'disciple_tools' ); ?><!--</strong> <br>-->
+<!--                </label>-->
+
                 <div style="text-align: center">
                     <a href="/contacts/" class="button small" title="<?php esc_html_e( 'Cancel and return to the Contacts List page', 'disciple_tools' )?>"><?php esc_html_e( 'Cancel', 'disciple_tools' )?></a>
                     <button class="button loader js-create-contact-button dt-green" type="submit" disabled title="<?php esc_html_e( 'Save and continue editing the new contact', 'disciple_tools' )?>"><?php esc_html_e( "Save and continue editing", "disciple_tools" ); ?></button>
@@ -116,8 +128,10 @@ get_header();
             .attr("disabled", true)
             .addClass("loading");
         let source = $(".js-create-contact select[name=sources]").val()
+        let type =  $(".js-create-contact input[name=type]:checked").val()
         API.create_post( 'contacts', {
             title: $(".js-create-contact input[name=title]").val(),
+            type: type || "media",
             contact_phone: [{value:$(".js-create-contact input[name=phone]").val()}],
             contact_email: [{value:$(".js-create-contact input[name=email]").val()}],
             sources: {values:[{value:source || "personal"}]},

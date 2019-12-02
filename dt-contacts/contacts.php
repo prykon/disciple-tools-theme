@@ -172,7 +172,15 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
                 $fields["seeker_path"] = "none";
             }
             if ( !isset( $fields["type"] ) ){
-                $fields["type"] = "media";
+                if ( isset( $fields["relation"] ) ||
+                     isset( $fields["baptized"] ) ||
+                     isset( $fields["baptized_by"] ) ||
+                     isset( $fields["coached_by"] ) ||
+                     isset( $fields["coaching"] ) ){
+                    $fields["type"] = "oikos";
+                } else {
+                    $fields["type"] = "media";
+                }
             }
             if ( !isset( $fields["last_modified"] ) ){
                 $fields["last_modified"] = time();
