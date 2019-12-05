@@ -7,7 +7,8 @@ if ( ! current_user_can( 'create_contacts' ) ) {
 
 get_header();
 
-( function() { ?>
+( function() {
+    $contact_fields = Disciple_Tools_Contacts::get_contact_fields(); ?>
 
 <div id="content">
     <div id="inner-content" class="grid-x grid-margin-x">
@@ -95,17 +96,18 @@ get_header();
                     <textarea name="initial_comment" dir="auto" placeholder="<?php esc_html_e( "Initial comment", "disciple_tools" ); ?>"></textarea>
                 </label>
 
-                    Contact type
-                    <br>
-                <label>
-                    <input type="radio" name="type" value="access" required><strong><?php esc_html_e( 'Access', 'disciple_tools' ); ?></strong>&nbsp;-&nbsp;<span><?php esc_html_e( 'From media, websites, camps or events', 'disciple_tools' ); ?></span> <br>
-                </label>
-                <label>
-                    <input type="radio" name="type" value="oikos"><strong><?php esc_html_e( 'Oikos', 'disciple_tools' ); ?></strong>&nbsp;-&nbsp;<span><?php esc_html_e( 'People you personally know or personal connection to existing contacts.', 'disciple_tools' ); ?></span> <br>
-                </label>
-<!--                <label>-->
-<!--                    <input type="radio" name="type" value="oikos"><strong>--><?php //esc_html_e( 'User', 'disciple_tools' ); ?><!--</strong> <br>-->
-<!--                </label>-->
+                <?php echo esc_html( $contact_fields["type"]["name"] ); ?>
+                <div style="margin: 10px 0 20px 0">
+                <?php foreach ( $contact_fields["type"]["default"] as $key => $type ) :
+                    if ( $key !== "user" ) : ?>
+                        <label>
+                            <input type="radio" name="type" value="<?php echo esc_html( $key ) ?>" required />
+                            <strong><?php echo esc_html( $type["label"] )?>:</strong>
+                            <?php echo esc_html( $type["description"] )?>
+                        </label>
+                    <?php endif;
+                endforeach; ?>
+                </div>
 
                 <div style="text-align: center">
                     <a href="/contacts/" class="button small" title="<?php esc_html_e( 'Cancel and return to the Contacts List page', 'disciple_tools' )?>"><?php esc_html_e( 'Cancel', 'disciple_tools' )?></a>
