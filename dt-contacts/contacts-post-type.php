@@ -544,11 +544,18 @@ class Disciple_Tools_Contact_Post_Type
             'description' => __( 'Type of contact', 'disciple_tools' ),
             'type'        => 'key_select',
             'default'     => [
-                'media'    => [ "label" => __( 'Media', 'disciple_tools' ) ],
-                'next_gen' => [ "label" => __( 'Next Generation', 'disciple_tools' ) ],
-                'user'     => [ "label" => __( 'User', 'disciple_tools' ) ],
-                'partner'  => [ "label" => __( 'Partner', 'disciple_tools' ) ],
-                'oikos' => [ "label" => "Oikos" ]
+                'user'     => [
+                    "label" => __( 'User', 'disciple_tools' ),
+                    "description" => __( 'This is someone who logs in to D.T', 'disciple_tools' )
+                ],
+                'access'    => [
+                    "label" => __( 'Access', 'disciple_tools' ),
+                    "description" => __( 'From an access strategy like media, websites, camps or events', 'disciple_tools' )
+                ],
+                'oikos' => [
+                    "label" => __( 'Personal Oikos', 'disciple_tools' ),
+                    "description" => __( 'Someone you personally know', 'disciple_tools' )
+                ],
             ],
             'section'     => 'misc',
 //            'hidden'      => true

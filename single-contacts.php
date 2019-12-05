@@ -198,8 +198,8 @@ if ( ! current_user_can( 'access_contacts' ) ) {
     }
     if ( current_user_can( "view_any_contacts" )){
         $dispatcher_actions[] = "merge_with_contact";
-        $dispatcher_actions[] = "change_contact_type";
     }
+    $dispatcher_actions[] = "change_contact_type";
     dt_print_details_bar(
         true,
         true,
@@ -820,13 +820,15 @@ if ( ! current_user_can( 'access_contacts' ) ) {
         <p class="lead"><?php echo esc_html_x( 'Type', 'change contact type modal', 'disciple_tools' ) ?></p>
         <p><?php echo esc_html_x( 'Choose the type that best describes this contact', 'change contact type modal', 'disciple_tools' ); ?></p>
         <form id="change-contact-type-form">
-            <?php foreach ( $contact_fields["type"]["default"] as $key => $type ) : ?>
-                <label>
-                    <input type="radio" name="type" value="<?php echo esc_html( $key ) ?>" required />
-                    <strong><?php echo esc_html( $type["label"] )?>:</strong>
-                    <?php echo esc_html( $type["description"] )?>
-                </label>
-            <?php endforeach; ?>
+            <?php foreach ( $contact_fields["type"]["default"] as $key => $type ) :
+                if ( $key !== "user" ) : ?>
+                    <label>
+                        <input type="radio" name="type" value="<?php echo esc_html( $key ) ?>" required />
+                        <strong><?php echo esc_html( $type["label"] )?>:</strong>
+                        <?php echo esc_html( $type["description"] )?>
+                    </label>
+                <?php endif;
+            endforeach; ?>
 
             <p style="color: red" class="error-text"></p>
 

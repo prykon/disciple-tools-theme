@@ -133,7 +133,7 @@ get_header();
         let type =  $(".js-create-contact input[name=type]:checked").val()
         API.create_post( 'contacts', {
             title: $(".js-create-contact input[name=title]").val(),
-            type: type || "media",
+            type: type || "access",
             contact_phone: [{value:$(".js-create-contact input[name=phone]").val()}],
             contact_email: [{value:$(".js-create-contact input[name=email]").val()}],
             sources: {values:[{value:source || "personal"}]},

@@ -30,13 +30,13 @@ function dt_print_details_bar(
 
                 <div class="grid-x grid-margin-x">
                     <div class="cell small-4 grid-x grid-margin-x">
-                        <div class="cell grid-x shrink center-items">
-                            <?php if ( $show_update_needed ){ ?>
+                        <?php if ( $show_update_needed ){ ?>
+                            <div class="cell grid-x shrink center-items">
                                 <span style="margin-right:5px"><?php esc_html_e( 'Update Needed', 'disciple_tools' )?>:</span>
                                 <input type="checkbox" id="update-needed" class="dt-switch update-needed" <?php echo ( $update_needed ? 'checked' : "" ) ?>/>
                                 <label class="dt-switch" for="update-needed" style="vertical-align: top;"></label>
-                            <?php } ?>
-                        </div>
+                            </div>
+                        <?php } ?>
                         <div class="cell grid-x shrink center-items">
                             <?php if ( sizeof( $dispatcher_actions ) > 0 ): ?>
                             <ul class="dropdown menu" data-dropdown-menu dropdownmenu-arrow-color="white">
