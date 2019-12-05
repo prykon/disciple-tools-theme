@@ -806,7 +806,12 @@ class Disciple_Tools_Posts
                 if ( $query_key === "subassigned" ) {
                     $subassigned_sql = "";
                     foreach ( $query_value as $subassigned ) {
-                        $l = get_post( $subassigned );
+                        if ( $subassigned === "me" ){
+                            $contact_id = Disciple_Tools_Users::get_contact_for_user( get_current_user_id() );
+                            $l = get_post( $contact_id );
+                        } else {
+                            $l = get_post( $subassigned );
+                        }
                         if ( $l && $l->post_type === "contacts" ){
                             $subassigned_sql .= empty( $subassigned_sql ) ? $l->ID : ( ",".$l->ID );
                         }
@@ -921,7 +926,7 @@ class Disciple_Tools_Posts
             " . $post_type_check . " " . $connections_sql_to . " ". $connections_sql_from . " " . $location_sql . " " . $meta_query . " " . $includes_query . " " . $access_query . "
             AND $wpdb->posts.post_type = %s
             AND ($wpdb->posts.post_status = 'publish' OR $wpdb->posts.post_status = 'private')
-            GROUP BY $wpdb->posts.ID
+            GROUP BY $wpdb->posts.ID, sort.meta_value
             ORDER BY " . $sort_sql . "
             LIMIT %d, " . $limit . "
             ",
