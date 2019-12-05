@@ -1428,6 +1428,33 @@ jQuery(document).ready(function($) {
     $(".js-create-contact input[name=title]").val('')
   })
 
+  //change contact type
+  $('#change-contact-type-form').on('submit', function (event) {
+    event.preventDefault();
+    $("#change-contact-type-form .submit-button").attr("disabled", true).addClass("loading");
+    let type =$("#change-contact-type-form input[name=type]:checked").val()
+    if ( !type ) {
+      $("#change-contact-type-form .error-text").text(
+        "Something went wrong. Please refresh and try again"
+      );
+      return;
+    }
+    API.update_post( 'contacts', contactId, { type } ).then(()=>{
+      window.location.reload()
+    })
+    .catch(function(error) {
+      $("#change-contact-type-form .submit-button").removeClass("loading").addClass("alert");
+      $("#change-contact-type-form .error-text").text(
+        _.get( error, "responseJSON.message", "Something went wrong. Please refresh and try again" )
+      );
+      console.error(error);
+    });
+  })
+  $('#change_contact_type_modal').on('closeme.zf.reveal', function () {
+    $("#change-contact-type-form .submit-button").attr("disabled", false).removeClass("alert")
+    $("#change-contact-type-form .error-text").empty()
+  })
+
 
 
   //leave at the end of this file

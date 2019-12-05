@@ -43,7 +43,7 @@ function dt_print_details_bar(
                                 <li style="border-radius: 5px">
                                     <a class="button menu-white-dropdown-arrow"
                                        style="background-color: #00897B; color: white;">
-                                        <?php esc_html_e( "Dispatcher actions", 'disciple_tools' ) ?></a>
+                                        <?php esc_html_e( "Admin actions", 'disciple_tools' ) ?></a>
                                     <ul class="menu">
                                         <?php foreach ( $dispatcher_actions as $action ) :
                                             if ( $action == "make_user_from_contact" ) : ?>
@@ -52,6 +52,8 @@ function dt_print_details_bar(
                                                 <li><a data-open="link_to_user"><?php esc_html_e( "Link to an existing user", 'disciple_tools' ) ?></a></li>
                                             <?php elseif ( $action == "merge_with_contact") : ?>
                                                 <li><a id="open_merge_with_contact"><?php esc_html_e( "Merge with another contact", 'disciple_tools' ) ?></a></li>
+                                            <?php elseif ( $action == "change_contact_type") : ?>
+                                                <li><a data-open="change_contact_type_modal"><?php esc_html_e( "Change contact type", 'disciple_tools' ) ?></a></li>
                                             <?php endif; ?>
                                         <?php endforeach; ?>
                                     </ul>

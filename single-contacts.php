@@ -198,6 +198,7 @@ if ( ! current_user_can( 'access_contacts' ) ) {
     }
     if ( current_user_can( "view_any_contacts" )){
         $dispatcher_actions[] = "merge_with_contact";
+        $dispatcher_actions[] = "change_contact_type";
     }
     dt_print_details_bar(
         true,
@@ -770,48 +771,77 @@ if ( ! current_user_can( 'access_contacts' ) ) {
         <p class="lead"><?php esc_html_e( 'Merge this contact with another contact', 'disciple_tools' )?></p>
 
 
-            <div class="merge_with details">
-                <var id="merge_with-result-container" class="result-container merge_with-result-container"></var>
-                <div id="merge_with_t" name="form-merge_with">
-                    <div class="typeahead__container">
-                        <div class="typeahead__field">
-                            <span class="typeahead__query">
-                                <input class="js-typeahead-merge_with input-height"
-                                       name="merge_with[query]" placeholder="<?php esc_html_e( "Search multipliers and contacts", 'disciple_tools' ) ?>"
-                                       autocomplete="off">
-                            </span>
-                            <span class="typeahead__button">
-                            <button type="button" class="search_merge_with typeahead__image_button input-height" data-id="user-select_t">
-                                <img src="<?php echo esc_html( get_template_directory_uri() . '/dt-assets/images/chevron_down.svg' ) ?>"/>
-                            </button>
+        <div class="merge_with details">
+            <var id="merge_with-result-container" class="result-container merge_with-result-container"></var>
+            <div id="merge_with_t" name="form-merge_with">
+                <div class="typeahead__container">
+                    <div class="typeahead__field">
+                        <span class="typeahead__query">
+                            <input class="js-typeahead-merge_with input-height"
+                                   name="merge_with[query]" placeholder="<?php esc_html_e( "Search multipliers and contacts", 'disciple_tools' ) ?>"
+                                   autocomplete="off">
                         </span>
-                        </div>
+                        <span class="typeahead__button">
+                        <button type="button" class="search_merge_with typeahead__image_button input-height" data-id="user-select_t">
+                            <img src="<?php echo esc_html( get_template_directory_uri() . '/dt-assets/images/chevron_down.svg' ) ?>"/>
+                        </button>
+                    </span>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <br>
-            <div class="confirm-merge-with-contact" style="display: none">
-                <p><span  id="name-of-contact-to-merge"></span> <?php esc_html_e( "selected.", 'disciple_tools' ) ?></p>
-                <p><?php esc_html_e( "Click merge to continue.", 'disciple_tools' ) ?></p>
-            </div>
+        <br>
+        <div class="confirm-merge-with-contact" style="display: none">
+            <p><span  id="name-of-contact-to-merge"></span> <?php esc_html_e( "selected.", 'disciple_tools' ) ?></p>
+            <p><?php esc_html_e( "Click merge to continue.", 'disciple_tools' ) ?></p>
+        </div>
 
-            <div class="grid-x">
-                <button class="button button-cancel clear" data-close aria-label="Close reveal" type="button">
-                    <?php esc_html_e( 'Cancel', 'disciple_tools' )?>
+        <div class="grid-x">
+            <button class="button button-cancel clear" data-close aria-label="Close reveal" type="button">
+                <?php esc_html_e( 'Cancel', 'disciple_tools' )?>
+            </button>
+            <form action='<?php echo esc_url( site_url() );?>/contacts/mergedetails' method='post'>
+                <input type='hidden' name='dt_contact_nonce' value='<?php echo esc_attr( wp_create_nonce() ); ?>'/>
+                <input type='hidden' name='currentid' value='<?php echo esc_html( $contact["ID"] );?>'/>
+                <input id="confirm-merge-with-contact-id" type='hidden' name='dupeid' value=''/>
+                <button type='submit' class="button confirm-merge-with-contact" style="display: none">
+                    <?php esc_html_e( 'Merge', 'disciple_tools' ) ?>
                 </button>
-                <form action='<?php echo esc_url( site_url() );?>/contacts/mergedetails' method='post'>
-                    <input type='hidden' name='dt_contact_nonce' value='<?php echo esc_attr( wp_create_nonce() ); ?>'/>
-                    <input type='hidden' name='currentid' value='<?php echo esc_html( $contact["ID"] );?>'/>
-                    <input id="confirm-merge-with-contact-id" type='hidden' name='dupeid' value=''/>
-                    <button type='submit' class="button confirm-merge-with-contact" style="display: none">
-                        <?php esc_html_e( 'Merge', 'disciple_tools' ) ?>
+            </form>
+            <button class="close-button" data-close aria-label="Close modal" type="button">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+
+
+    <div class="reveal" id="change_contact_type_modal" data-reveal>
+        <p class="lead"><?php echo esc_html_x( 'Type', 'change contact type modal', 'disciple_tools' ) ?></p>
+        <p><?php echo esc_html_x( 'Choose the type that best describes this contact', 'change contact type modal', 'disciple_tools' ); ?></p>
+        <form id="change-contact-type-form">
+            <?php foreach ( $contact_fields["type"]["default"] as $key => $type ) : ?>
+                <label>
+                    <input type="radio" name="type" value="<?php echo esc_html( $key ) ?>" required />
+                    <strong><?php echo esc_html( $type["label"] )?>:</strong>
+                    <?php echo esc_html( $type["description"] )?>
+                </label>
+            <?php endforeach; ?>
+
+            <p style="color: red" class="error-text"></p>
+
+            <div class="grid-x" style="margin-top: 10px">
+                <div>
+                    <button class="button loader submit-button" type="submit"><?php esc_html_e( "Submit Change", "disciple_tools" ); ?></button>
+                    <button class="button button-cancel clear" data-close aria-label="Close reveal" type="button">
+                        <?php esc_html_e( 'Cancel', 'disciple_tools' )?>
                     </button>
-                </form>
-                <button class="close-button" data-close aria-label="Close modal" type="button">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                </div>
             </div>
+        </form>
+        <button class="close-button" data-close aria-label="Close modal" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
 
     <?php
