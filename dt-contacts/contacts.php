@@ -172,15 +172,7 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
                 $fields["seeker_path"] = "none";
             }
             if ( !isset( $fields["type"] ) ){
-                if ( isset( $fields["relation"] ) ||
-                     isset( $fields["baptized"] ) ||
-                     isset( $fields["baptized_by"] ) ||
-                     isset( $fields["coached_by"] ) ||
-                     isset( $fields["coaching"] ) ){
-                    $fields["type"] = "oikos";
-                } else {
-                    $fields["type"] = "media";
-                }
+                $fields["type"] = "media";
             }
             if ( !isset( $fields["last_modified"] ) ){
                 $fields["last_modified"] = time();
@@ -1376,22 +1368,20 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
         // contacts assigned to me
         $my_access = "INNER JOIN $wpdb->postmeta as assigned_to
             ON a.ID=assigned_to.post_id
-              AND assigned_to.meta_key = 'assigned_to'
-              AND assigned_to.meta_value = CONCAT( 'user-', " . $user_id . " )
-              JOIN $wpdb->postmeta as type
-                ON ( a.ID=type.post_id
-                  AND type.meta_key = 'type'
-                  AND type.meta_value = 'access' )
-        ";
+                AND assigned_to.meta_key = 'assigned_to'
+                AND assigned_to.meta_value = CONCAT( 'user-', " . $user_id . " )
+            JOIN $wpdb->postmeta as type ON ( 
+                a.ID=type.post_id
+                AND type.meta_key = 'type'
+                AND type.meta_value = 'access' )";
         $oikos_access = "INNER JOIN $wpdb->postmeta as assigned_to
             ON a.ID=assigned_to.post_id
-              AND assigned_to.meta_key = 'assigned_to'
-              AND assigned_to.meta_value = CONCAT( 'user-', " . $user_id . " )
-              JOIN $wpdb->postmeta as type
-                ON ( a.ID=type.post_id
-                  AND type.meta_key = 'type'
-                  AND type.meta_value = 'oikos' )
-        ";
+                AND assigned_to.meta_key = 'assigned_to'
+                AND assigned_to.meta_value = CONCAT( 'user-', " . $user_id . " )
+            JOIN $wpdb->postmeta as type ON (
+                a.ID=type.post_id
+                AND type.meta_key = 'type'
+                AND type.meta_value = 'oikos' )";
         //contacts subassigned to me
         $subassigned_access = "INNER JOIN $wpdb->p2p as from_p2p 
             ON ( from_p2p.p2p_to = a.ID 
@@ -1411,9 +1401,9 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
                 )
             )";
         $all_access = "JOIN $wpdb->postmeta as type
-                        ON ( a.ID=type.post_id
-                          AND type.meta_key = 'type'
-                          AND type.meta_value = 'access' )";
+            ON ( a.ID=type.post_id
+                AND type.meta_key = 'type'
+                AND type.meta_value = 'access' )";
         $closed = "";
         if ( !$show_closed ){
             $closed = " INNER JOIN $wpdb->postmeta as status
@@ -1459,6 +1449,60 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
 
         // phpcs:disable
         // WordPress.WP.PreparedSQL.NotPrepare
+        $contacts_by_status = $wpdb->get_results( $wpdb->prepare( "
+            SELECT pm.meta_value, count(pm.meta_value) as count
+            FROM $wpdb->postmeta pm
+            INNER JOIN $wpdb->posts a ON( a.ID = pm.post_id AND a.post_type = 'contacts' and a.post_status = 'publish' )
+            " . $access_sql . "
+            WHERE pm.meta_key = %s
+            AND pm.post_id NOT IN ( $user_posts )
+            GROUP BY pm.meta_value
+        ", esc_sql( 'overall_status' ) ), ARRAY_A );
+        $active_seeker_path = $wpdb->get_results( $wpdb->prepare( "
+            SELECT pm.meta_value, count(pm.meta_value) as count
+            FROM $wpdb->postmeta pm
+            INNER JOIN $wpdb->posts a ON( a.ID = pm.post_id AND a.post_type = 'contacts' and a.post_status = 'publish' )
+            INNER JOIN $wpdb->postmeta status ON( status.post_id = pm.post_id AND status.meta_key = 'overall_status' and status.meta_value = 'active' )
+            " . $access_sql . "
+            WHERE pm.meta_key = %s
+            AND pm.post_id NOT IN ( $user_posts )
+            GROUP BY pm.meta_value
+        ", esc_sql( 'seeker_path' ) ), ARRAY_A );
+
+        foreach ( $contacts_by_status as $value ){
+            if ( $value["meta_value"] === "closed" && !$show_closed ){
+                continue;
+            }
+            switch ( $value["meta_value"] ){
+                case "active":
+                    $numbers["active"] = $value["count"];
+                    break;
+                case "assigned":
+                    $numbers["needs_accepted"] = $value["count"];
+                    break;
+                case "unassigned":
+                    $numbers["needs_assigned"] = $value["count"];
+                    break;
+                case "new":
+                    $numbers["new"] = $value["count"];
+                    break;
+                case "unassignable":
+                    $numbers["unassignable"] = $value["count"];
+                    break;
+            }
+        }
+        foreach ( $active_seeker_path as $value ){
+            switch ( $value["meta_value"] ){
+                case "none":
+                    $numbers["contact_unattempted"] = $value["count"];
+                    break;
+                case "scheduled":
+                    $numbers["meeting_scheduled"] = $value["count"];
+                    break;
+            }
+        }
+
+
         $personal_counts = $wpdb->get_results("
             SELECT (
                 SELECT count( DISTINCT( a.ID ) )
@@ -1530,67 +1574,7 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
                 " . $query_sql . "
                 AND post_type = 'contacts'
                 AND a.ID NOT IN ( $user_posts )
-            ) as update_needed,
-            (
-                SELECT count(a.ID)
-                FROM $wpdb->posts as a
-                " . $access_sql . "
-                JOIN $wpdb->postmeta as b
-                  ON a.ID=b.post_id
-                    AND b.meta_key = 'overall_status'
-                    AND b.meta_value = 'active'
-                WHERE a.post_status = 'publish'
-                " . $query_sql . "
-                AND post_type = 'contacts'
-                AND a.ID NOT IN ( $user_posts )
-            ) as active,
-            (
-                SELECT count(a.ID)
-                FROM $wpdb->posts as a
-                " . $access_sql . "
-                INNER JOIN $wpdb->postmeta as d
-                  ON a.ID=d.post_id
-                    AND d.meta_key = 'overall_status'
-                    AND d.meta_value = 'assigned'
-                WHERE a.post_status = 'publish'
-                " . $query_sql . "
-                AND post_type = 'contacts'
-                AND a.ID NOT IN ( $user_posts )
-            ) as needs_accepted,
-            (
-                SELECT count(a.ID)
-                FROM $wpdb->posts as a
-                JOIN $wpdb->postmeta as b
-                  ON a.ID=b.post_id
-                    AND b.meta_key = 'seeker_path'
-                    AND b.meta_value = 'none'
-                " . $access_sql . $closed . "
-                JOIN $wpdb->postmeta as d
-                  ON a.ID=d.post_id
-                    AND d.meta_key = 'overall_status'
-                    AND d.meta_value = 'active'
-                WHERE a.post_status = 'publish'
-                " . $query_sql . "
-                AND post_type = 'contacts'
-                AND a.ID NOT IN ( $user_posts )
-            ) as contact_unattempted,
-            (
-                SELECT count(a.ID)
-                FROM $wpdb->posts as a
-                JOIN $wpdb->postmeta as b
-                  ON a.ID=b.post_id
-                    AND b.meta_key = 'seeker_path'
-                    AND b.meta_value = 'scheduled'
-                " . $access_sql . $closed . "
-                JOIN $wpdb->postmeta as d
-                  ON a.ID=d.post_id
-                    AND d.meta_key = 'overall_status'
-                    AND d.meta_value = 'active'
-                WHERE a.post_status = 'publish'
-                " . $query_sql . "
-                AND post_type = 'contacts'
-                AND a.ID NOT IN ( $user_posts )
-            ) as meeting_scheduled
+            ) as update_needed
             ", ARRAY_A );
 
         if ( empty( $personal_counts ) ) {
@@ -1601,58 +1585,20 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
             $numbers[$key] = $value;
         }
 
-        if ( user_can( $user_id, 'view_any_contacts' ) ) {
-            $dispatcher_counts = $wpdb->get_results( "
-            SELECT (
-                SELECT count(a.ID)
-                FROM $wpdb->posts as a
-                INNER JOIN $wpdb->postmeta as b
-                    ON a.ID=b.post_id
-                    AND b.meta_key = 'overall_status'
-                    AND b.meta_value = 'unassigned'
-                " . $access_sql . "
-                WHERE a.post_status = 'publish'
-            ) as needs_assigned,
-            (
-                SELECT count(a.ID)
-                FROM $wpdb->posts as a
-                INNER JOIN $wpdb->postmeta as b
-                  ON a.ID=b.post_id
-                     AND b.meta_key = 'overall_status'
-                     AND b.meta_value = 'new'
-                " . $access_sql . "
-                
-                WHERE a.post_status = 'publish'
-                AND a.ID NOT IN ( $user_posts )
-            ) as new
-            (
-                SELECT count(a.ID)
-                FROM $wpdb->posts as a
-                INNER JOIN $wpdb->postmeta as b
-                  ON a.ID=b.post_id
-                     AND b.meta_key = 'overall_status'
-                     AND b.meta_value = 'unassignable'
-                " . $access_sql . "
-                
-                WHERE a.post_status = 'publish'
-                AND a.ID NOT IN ( $user_posts )
-            ) as unassignable
-            ", ARRAY_A );
 
-            foreach ( $dispatcher_counts[0] as $key => $value ) {
-                $numbers[$key] = $value;
-            }
-        }
         // phpcs:enable
 
         $numbers = wp_parse_args( $numbers, [
-            'my_contacts' => 0,
-            'update_needed' => 0,
-            'needs_accepted' => 0,
-            'contact_unattempted' => 0,
-            'meeting_scheduled' => 0,
-            'all_contacts' => 0,
-            'needs_assigned' => 0,
+            'my_contacts' => '0',
+            'update_needed' => '0',
+            'needs_accepted' => '0',
+            'contact_unattempted' => '0',
+            'meeting_scheduled' => '0',
+            'all_contacts' => '0',
+            'needs_assigned' => '0',
+            'new' => '0',
+            'unassignable' => '0',
+            'unassigned' => '0'
         ] );
 
         return $numbers;
