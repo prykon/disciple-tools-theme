@@ -10,7 +10,7 @@ get_header();
 ( function() {
     $contact_fields = Disciple_Tools_Contacts::get_contact_fields(); ?>
 
-<div id="content">
+<div id="content" class="template-contacts-new">
     <div id="inner-content" class="grid-x grid-margin-x">
         <div class="large-2 medium-12 small-12 cell"></div>
 

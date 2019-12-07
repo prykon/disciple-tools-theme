@@ -806,22 +806,27 @@ class Disciple_Tools_Posts
                 if ( $query_key === "subassigned" ) {
                     $subassigned_sql = "";
                     foreach ( $query_value as $subassigned ) {
-                        if ( $subassigned === "me" ){
-                            $contact_id = Disciple_Tools_Users::get_contact_for_user( get_current_user_id() );
-                            $l = get_post( $contact_id );
-                        } else {
-                            $l = get_post( $subassigned );
-                        }
+                        $l = get_post( $subassigned );
                         if ( $l && $l->post_type === "contacts" ){
                             $subassigned_sql .= empty( $subassigned_sql ) ? $l->ID : ( ",".$l->ID );
                         }
                     }
                     if ( !empty( $subassigned_sql ) ){
                         if ( !empty( $access_query ) && in_array( "subassigned", $combine ) ){
-                            $access_query .= "OR ( from_p2p.p2p_type = 'contacts_to_subassigned' AND from_p2p.p2p_from in (" . esc_sql( $subassigned_sql ) .") )";
+                            $access_query .= "OR ( from_p2p.p2p_type = 'contacts_to_subassigned' AND from_p2p.p2p_from in (" . esc_sql( $connection_ids ) .") )";
                             $connections_sql_from .= " ";
                         } else {
-                            $connections_sql_from .= "AND ( from_p2p.p2p_type = 'contacts_to_subassigned' AND from_p2p.p2p_from in (" . esc_sql( $subassigned_sql ) .") )";
+                            $connections_sql_from .= "AND ( from_p2p.p2p_type = 'contacts_to_subassigned' AND from_p2p.p2p_from in (" . esc_sql( $connection_ids ) .") )";
+                        }
+                    } else {
+                        if ( $post_fields[$query_key]["p2p_direction"] === "to" ){
+                            $meta_query .= " AND ( $wpdb->posts.ID IN ( 
+                                SELECT p2p_to from $wpdb->p2p WHERE p2p_type = '" . esc_html( $post_fields[$query_key]["p2p_key"] ) . "' AND p2p_from IN (" . esc_sql( $connection_ids ) .")
+                            ) ) ";
+                        } else {
+                            $meta_query .= " AND ( $wpdb->posts.ID IN ( 
+                                SELECT p2p_from from $wpdb->p2p WHERE p2p_type = '" . esc_html( $post_fields[$query_key]["p2p_key"] ) . "' AND p2p_to IN (" . esc_sql( $connection_ids ) .")
+                            ) ) ";
                         }
                     }
                 }
@@ -921,7 +926,7 @@ class Disciple_Tools_Posts
         // WordPress.WP.PreparedSQL.NotPrepared
         $prepared_sql = $wpdb->prepare("
             SELECT SQL_CALC_FOUND_ROWS $wpdb->posts.ID, $wpdb->posts.post_title, $wpdb->posts.post_type FROM $wpdb->posts
-            " . $sort_join . " " . $inner_joins . " " . $share_joins . " " . $access_joins . "
+            " . $inner_joins . " " . $share_joins . " " . $access_joins . " " . $sort_join . "
             WHERE 1=1
             " . $post_type_check . " " . $connections_sql_to . " ". $connections_sql_from . " " . $location_sql . " " . $meta_query . " " . $includes_query . " " . $access_query . "
             AND $wpdb->posts.post_type = %s
