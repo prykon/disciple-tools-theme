@@ -1377,7 +1377,21 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
         $my_access = "INNER JOIN $wpdb->postmeta as assigned_to
             ON a.ID=assigned_to.post_id
               AND assigned_to.meta_key = 'assigned_to'
-              AND assigned_to.meta_value = CONCAT( 'user-', " . $user_id . " )";
+              AND assigned_to.meta_value = CONCAT( 'user-', " . $user_id . " )
+              JOIN $wpdb->postmeta as type
+                ON ( a.ID=type.post_id
+                  AND type.meta_key = 'type'
+                  AND type.meta_value = 'access' )
+        ";
+        $oikos_access = "INNER JOIN $wpdb->postmeta as assigned_to
+            ON a.ID=assigned_to.post_id
+              AND assigned_to.meta_key = 'assigned_to'
+              AND assigned_to.meta_value = CONCAT( 'user-', " . $user_id . " )
+              JOIN $wpdb->postmeta as type
+                ON ( a.ID=type.post_id
+                  AND type.meta_key = 'type'
+                  AND type.meta_value = 'oikos' )
+        ";
         //contacts subassigned to me
         $subassigned_access = "INNER JOIN $wpdb->p2p as from_p2p 
             ON ( from_p2p.p2p_to = a.ID 
@@ -1396,7 +1410,10 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
                       AND assigned_to.meta_value = CONCAT( 'user-', " . $user_id . " )
                 )
             )";
-        $all_access = "";
+        $all_access = "JOIN $wpdb->postmeta as type
+                        ON ( a.ID=type.post_id
+                          AND type.meta_key = 'type'
+                          AND type.meta_value = 'access' )";
         $closed = "";
         if ( !$show_closed ){
             $closed = " INNER JOIN $wpdb->postmeta as status
@@ -1426,6 +1443,8 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
             $access_sql = $shared_access;
         } elseif ( $tab === "all" ){
             $access_sql = $all_access;
+        } elseif ( $tab === "oikos" ){
+            $access_sql = $oikos_access;
         }
 
         //filter out the contacts linked to users.
@@ -1461,11 +1480,28 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
             (
                 SELECT count(a.ID)
                 FROM $wpdb->posts as a
+                " . $oikos_access . $closed . "
+                WHERE a.post_status = 'publish'
+                AND post_type = 'contacts'
+               AND a.ID NOT IN ( $user_posts )
+            ) as my_oikos,
+            (
+                SELECT count(a.ID)
+                FROM $wpdb->posts as a
                 " . $subassigned_access . $closed . "
                 WHERE a.post_status = 'publish'
                 AND post_type = 'contacts'
                 AND a.ID NOT IN ( $user_posts )
-            ) as total_subassigned,
+            ) as my_subassigned,
+            (
+                SELECT count(a.ID)
+                FROM $wpdb->posts as a
+                " . $closed . "
+                WHERE a.post_status = 'publish'
+                AND post_type = 'contacts'
+                AND a.ID IN ( SELECT p2p_from FROM $wpdb->p2p where p2p_type = 'contacts_to_contacts' and p2p_to = '$user_post' )
+                AND a.ID NOT IN ( $user_posts )
+            ) as my_coaching,
             (
                 SELECT count(a.ID)
                 FROM $wpdb->posts as a
@@ -1473,7 +1509,7 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
                 WHERE a.post_status = 'publish'
                 AND post_type = 'contacts'
                 AND a.ID NOT IN ( $user_posts )
-            ) as total_shared,
+            ) as my_shared,
             (
                 SELECT count(a.ID)
                 FROM $wpdb->posts as a

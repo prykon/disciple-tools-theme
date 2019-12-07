@@ -548,14 +548,104 @@ class Disciple_Tools_Users
         return $base_user;
     }
 
+
+    public static function add_default_list_filters( $filters ){
+        if ( empty( $filters )){
+            $filters = [];
+        }
+        $default_filters = [
+            "contacts" => [
+                [
+                    'ID' => 'my_coaching',
+                    'visible' => "1",
+                    'type' => 'default_filter',
+                    'name' => 'Coached by me',
+                    'query' => [
+                        'coached_by' => [ 'me' ],
+                        'sort' => 'seeker_path',
+                    ],
+                    'labels' => [
+                        [
+                            'id' => 'my_coaching',
+                            'name' => 'Coached by be',
+                            'field' => 'coached_by',
+                        ],
+                    ],
+                ],
+                [
+                    'ID' => 'my_subassigned',
+                    'visible' => "1",
+                    'type' => 'default_filter',
+                    'name' => 'Subassigned to me',
+                    'query' => [
+                        'subassigned' => [ 'me' ],
+                        'sort' => 'overall_status',
+                    ],
+                    'labels' => [
+                        [
+                            'id' => 'my_subassigned',
+                            'name' => 'Subassigned to me',
+                            'field' => 'subassigned',
+                        ],
+                    ],
+                ],
+                [
+                    'ID' => 'my_shared',
+                    'visible' => "1",
+                    'type' => 'default_filter',
+                    'name' => 'Shared with me',
+                    'query' => [
+                        'assigned_to' => [ 'shared' ],
+                        'sort' => 'overall_status',
+                    ],
+                    'labels' => [
+                        [
+                            'id' => 'my_shared',
+                            'name' => 'Shared with me',
+                            'field' => 'subassigned',
+                        ],
+                    ],
+                ]
+
+            ]
+        ];
+        $contact_filter_ids = array_map( function ( $a ){
+            return $a["ID"];
+        }, $filters["contacts"] ?? [] );
+        $updated = false;
+        foreach ( $default_filters["contacts"] as $filter ) {
+            if ( !in_array( $filter["ID"], $contact_filter_ids ) ){
+                $filters["contacts"][] = $filter;
+                $updated = true;
+            }
+        }
+        if ( $updated ){
+            update_user_option( get_current_user_id(), "saved_filters", $filters );
+        }
+        //translation for default fields
+        foreach ( $filters["contacts"] ?? [] as $index => $filter ) {
+            if ( $filter["name"] === 'Subassigned to me' ) {
+                $filters["contacts"][$index]["name"] = __( 'Subassigned to me', 'disciple_tools' );
+                $filters["contacts"][$index]['labels'][0]['name'] = __( 'Subassigned to me', 'disciple_tools' );
+            }
+            if ( $filter["name"] === 'Shared with me' ) {
+                $filters["contacts"][$index]["name"] = __( 'Shared wth me', 'disciple_tools' );
+                $filters["contacts"][$index]['labels'][0]['name'] = __( 'Shared with me', 'disciple_tools' );
+            }
+            if ( $filter["name"] === 'Coached by me' ) {
+                $filters["contacts"][$index]["name"] = __( 'Coached by me', 'disciple_tools' );
+                $filters["contacts"][$index]['labels'][0]['name'] = __( 'Coached by me', 'disciple_tools' );
+            }
+        }
+        return $filters;
+    }
+
     public static function get_user_filters(){
         $current_user_id = get_current_user_id();
         $filters = [];
         if ( $current_user_id ){
             $filters = maybe_unserialize( get_user_option( "saved_filters", $current_user_id ) );
-            if ( empty( $filters )){
-                $filters = [];
-            }
+            $filters = self::add_default_list_filters( $filters );
         }
         return $filters;
     }

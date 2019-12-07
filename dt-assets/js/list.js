@@ -118,7 +118,7 @@
   function setupFilters(filters){
     savedFiltersList.empty()
     filters.forEach(filter=>{
-      if (filter){
+      if (filter && filter.visible !== '' ){
         let deleteFilter = $(`<span style="float:right" data-filter="${_.escape( filter.ID )}">
             <img style="padding: 0 4px" src="${wpApiShare.template_dir}/dt-assets/images/trash.svg">
         </span>`).on("click", function () {
@@ -132,7 +132,7 @@
           editSavedFilter( filter )
           filterToEdit = filter.ID;
         })
-        let filterName =  `<span class="filter-list-name" data-filter="${_.escape( filter.ID )}">${_.escape( filter.name )}</span>`
+        let filterName =  `<span class="filter-list-name" data-filter="${_.escape( filter.ID )}">${_.escape( filter.name )} <span data-value="${_.escape( filter.ID )}" class="custom-filter-count"></span></span>`
         const radio = $(`<input name='view' class='js-list-view' autocomplete='off' data-id="${_.escape( filter.ID )}" >`)
           .attr("type", "radio")
           .val("saved-filters")
@@ -426,17 +426,16 @@
       filter.tab = selectedFilterTab
       if ( selectedFilterTab === "all" ){
         query.assigned_to = ["all"]
+        query.type = ["access"]
         filter.labels = [{ id:"all", name:wpApiListSettings.translations.filter_all, field: "assigned"}]
-      } else if ( selectedFilterTab === "shared" ){
-        query.assigned_to = ["shared"]
-        filter.labels = [{ id:"shared", name:wpApiListSettings.translations.filter_shared, field: "assigned"}]
-      } else if ( selectedFilterTab === "subassigned" ){
-        query.subassigned = [wpApiListSettings.current_user_contact_id]
-        filter.labels = [{ id:"subbassigned", name:wpApiListSettings.translations.filter_subassigned, field: "assigned"}]
-      }
-      else if ( selectedFilterTab === "my" ){
+      } else if ( selectedFilterTab === "my" ){
         query.assigned_to = ["me"]
+        query.type = ["access"]
         filter.labels = [{ id:"me", name:wpApiListSettings.translations.filter_my, field: "assigned"}]
+      } else if ( selectedFilterTab === "oikos" ){
+        query.assigned_to = ["me"]
+        query.type = ["oikos"]
+        filter.labels = [{ id:"oikos", name:wpApiListSettings.translations.filter_my, field: "type"}]
       }
     }
     let filter_name = wpApiListSettings.translations[`filter_${currentView}`]
@@ -589,7 +588,12 @@
 
   //delete a filter
   $(`#confirm-filter-delete`).on('click', function () {
-    _.pullAllBy(savedFilters[wpApiListSettings.current_post_type], [{ID:filterToDelete}], "ID")
+    let filter = _.find(savedFilters[wpApiListSettings.current_post_type], {ID:filterToDelete})
+    if ( filter && filter.visible === true ){
+      filter.visible = false;
+    } else {
+      _.pullAllBy(savedFilters[wpApiListSettings.current_post_type], [{ID:filterToDelete}], "ID")
+    }
     API.save_filters(savedFilters).then(()=>{
       setupFilters(savedFilters[wpApiListSettings.current_post_type])
     }).catch(err => { console.error(err) })
@@ -796,7 +800,7 @@
   }
 
   /**
-   * Leaders
+   * Subassigned
    */
   let loadSubassignedTypeahead = ()=> {
     if (!window.Typeahead['.js-typeahead-subassigned']) {
@@ -833,6 +837,41 @@
             let name = _.get(wpApiListSettings, `custom_fields_settings.subassigned.name`, 'subassigned')
             newFilterLabels.push({id: item.ID, name: `${name}:${item.name}`, field: "subassigned"})
             selectedFilters.append(`<span class="current-filter subassigned" data-id="${_.escape( item.ID )}">${_.escape( name )}:${_.escape( item.name )}</span>`)
+          }
+        }
+      });
+    }
+  }
+    /**
+   * Coached By
+   */
+  let loadCoachedByTypeahead = ()=> {
+    if (!window.Typeahead['.js-typeahead-coached_by']) {
+      $.typeahead({
+        ...TYPEAHEADS.defaultContactTypeahead(),
+        input: '.js-typeahead-coached_by',
+        multiselect: {
+          matchOn: ["ID"],
+          data: [],
+          callback: {
+            onCancel: function (node, item) {
+              $(`.current-filter[data-id="${_.escape( item.ID )}"].coached_by`).remove()
+              _.pullAllBy(newFilterLabels, [{id: item.ID}], "id")
+            }
+          }
+        },
+        callback: {
+          onResult: function (node, query, result, resultCount) {
+            let text = TYPEAHEADS.typeaheadHelpText(resultCount, query, result)
+            $('#coached_by-result-container').html(text);
+          },
+          onHideLayout: function () {
+            $('#coached_by-result-container').html("");
+          },
+          onClick: function (node, a, item, event) {
+            let name = _.get(wpApiListSettings, `custom_fields_settings.coached_by.name`, 'coached_by')
+            newFilterLabels.push({id: item.ID, name: `${name}:${item.name}`, field: "coached_by"})
+            selectedFilters.append(`<span class="current-filter coached_by" data-id="${_.escape( item.ID )}">${_.escape( name )}:${_.escape( item.name )}</span>`)
           }
         }
       });
@@ -1002,6 +1041,7 @@
       loadLocationTypeahead()
       loadAssignedToTypeahead()
       loadSubassignedTypeahead()
+      loadCoachedByTypeahead()
       typeaheadsLoaded = loadMultiSelectTypeaheads().catch(err => { console.error(err) })
     }
     $('#new-filter-name').val('')
@@ -1161,6 +1201,13 @@
         let view_id = $el.data("value")
         if ( counts && counts[view_id] ){
           $el.text( counts[view_id] );
+        }
+      });
+      $(".custom-filter-count").each(function() {
+        const $el = $(this);
+        let view_id = $el.data("value")
+        if ( counts && counts[view_id] ){
+          $el.text( `(${counts[view_id]})`  );
         }
       });
       $(".tab-count-span").each(function () {

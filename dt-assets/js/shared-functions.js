@@ -284,7 +284,20 @@ window.TYPEAHEADS = {
                 }
             }
         });
+    },
+  defaultContactTypeahead : function () {
+    return {
+      minLength: 0,
+      accent: true,
+      searchOnFocus: true,
+      maxItem: 20,
+      template: this.contactListRowTemplate,
+      source: this.typeaheadContactsSource(),
+      display: "name",
+      templateValue: "{{name}}",
+      dynamic: true,
     }
+  }
 }
 
 window.SHAREDFUNCTIONS = {
