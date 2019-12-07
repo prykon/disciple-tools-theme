@@ -42,6 +42,14 @@
         </div>
     </section>
     <?php } ?>
+<!--    @todo remove-->
+    <?php if (isset( $contact['type'] )) { ?>
+        <section class="cell" id="contact-type">
+            <div class="bordered-box detail-notification-box" style="background-color:#9b379b">
+                <h4>(For development) <?php echo esc_html( $contact["type"]["label"] )?></h4>
+            </div>
+        </section>
+    <?php } ?>
 
     <?php do_action( 'dt_contact_detail_notification', $contact ); ?>
 

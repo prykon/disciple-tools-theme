@@ -172,7 +172,7 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
                 $fields["seeker_path"] = "none";
             }
             if ( !isset( $fields["type"] ) ){
-                $fields["type"] = "media";
+                $fields["type"] = "access";
             }
             if ( !isset( $fields["last_modified"] ) ){
                 $fields["last_modified"] = time();
@@ -205,6 +205,9 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
                      strpos( $fields["assigned_to"], "user" ) === false ){
                     $fields["assigned_to"] = "user-" . $fields["assigned_to"];
                 }
+            }
+            if ( $fields["type"] === "oikos" && !isset( $fields["overall_status"] ) ) {
+                    $fields["overall_status"] = 'active';
             }
             if ( !isset( $fields["overall_status"] ) ){
                 $current_roles = wp_get_current_user()->roles;
