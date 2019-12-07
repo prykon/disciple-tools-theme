@@ -431,7 +431,7 @@
       filter.tab = selectedFilterTab
       if ( selectedFilterTab === "all" ){
         query.assigned_to = ["all"]
-        query.type = ["access"]
+
         filter.labels = [{ id:"all", name:wpApiListSettings.translations.filter_all, field: "assigned"}]
       } else if ( selectedFilterTab === "my" ){
         query.assigned_to = ["me"]
@@ -1209,8 +1209,10 @@
       $(".js-list-view-count").each(function() {
         const $el = $(this);
         let view_id = $el.data("value")
-        if ( counts && counts[view_id] ){
+        if ( counts && counts[view_id] && parseInt( counts[view_id] ) > 0 ){
           $el.text( counts[view_id] );
+        } else {
+          $el.text( '0' );
         }
       });
       $(".custom-filter-count").each(function() {
