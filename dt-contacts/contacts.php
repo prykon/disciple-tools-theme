@@ -1400,10 +1400,7 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
                       AND assigned_to.meta_value = CONCAT( 'user-', " . $user_id . " )
                 )
             )";
-        $all_access = "JOIN $wpdb->postmeta as type
-            ON ( a.ID=type.post_id
-                AND type.meta_key = 'type'
-                AND type.meta_value = 'access' )";
+        $all_access = "";
         $closed = "";
         if ( !$show_closed ){
             $closed = " INNER JOIN $wpdb->postmeta as status
@@ -1468,6 +1465,19 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
             AND pm.post_id NOT IN ( $user_posts )
             GROUP BY pm.meta_value
         ", esc_sql( 'seeker_path' ) ), ARRAY_A );
+        $contacts_by_type = $wpdb->get_results("
+            SELECT pm.meta_value, count(pm.meta_value) as count
+            FROM $wpdb->postmeta pm
+            INNER JOIN $wpdb->posts a ON( a.ID = pm.post_id AND a.post_type = 'contacts' and a.post_status = 'publish' )
+            INNER JOIN $wpdb->postmeta as assigned_to ON (
+                a.ID=assigned_to.post_id
+                AND assigned_to.meta_key = 'assigned_to'
+                AND assigned_to.meta_value = CONCAT( 'user-', " . $user_id . " ) )
+            " . $closed . "
+            WHERE pm.meta_key = 'type'
+            AND pm.post_id NOT IN ( $user_posts )
+            GROUP BY pm.meta_value
+        ", ARRAY_A );
 
         foreach ( $contacts_by_status as $value ){
             if ( $value["meta_value"] === "closed" && !$show_closed ){
@@ -1501,6 +1511,18 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
                     break;
             }
         }
+        $numbers["total_all"] = 0;
+        foreach ( $contacts_by_type as $value ){
+            $numbers["total_all"] += (int) $value["count"];
+            switch ( $value["meta_value"] ){
+                case "access":
+                    $numbers["total_my"] = $value["count"];
+                    break;
+                case "oikos":
+                    $numbers["my_oikos"] = $value["count"];
+                    break;
+            }
+        }
 
 
         $personal_counts = $wpdb->get_results("
@@ -1513,22 +1535,6 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
                 " . $query_sql . "
                 AND a.ID NOT IN ( $user_posts )
             ) as total_count,
-            (
-                SELECT count(a.ID)
-                FROM $wpdb->posts as a
-                " . $my_access . $closed . "
-                WHERE a.post_status = 'publish'
-                AND post_type = 'contacts'
-               AND a.ID NOT IN ( $user_posts )
-            ) as total_my,
-            (
-                SELECT count(a.ID)
-                FROM $wpdb->posts as a
-                " . $oikos_access . $closed . "
-                WHERE a.post_status = 'publish'
-                AND post_type = 'contacts'
-               AND a.ID NOT IN ( $user_posts )
-            ) as my_oikos,
             (
                 SELECT count(a.ID)
                 FROM $wpdb->posts as a
@@ -1554,14 +1560,6 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
                 AND post_type = 'contacts'
                 AND a.ID NOT IN ( $user_posts )
             ) as my_shared,
-            (
-                SELECT count(a.ID)
-                FROM $wpdb->posts as a
-                " . $all_access . $closed . "
-                WHERE a.post_status = 'publish'
-                AND post_type = 'contacts'
-                AND a.ID NOT IN ( $user_posts )
-            ) as total_all,
             (
                 SELECT count(a.ID)
                 FROM $wpdb->posts as a
