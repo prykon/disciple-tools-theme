@@ -802,16 +802,22 @@ class Disciple_Tools_Posts
                         OR location_grid_counter.grid_id IN (" . $location_grid_ids .")
                     )";
             }
-            if ( in_array( $query_key, array_keys( self::$connection_types ) ) ) {
-                if ( $query_key === "subassigned" ) {
-                    $subassigned_sql = "";
-                    foreach ( $query_value as $subassigned ) {
-                        $l = get_post( $subassigned );
-                        if ( $l && $l->post_type === "contacts" ){
-                            $subassigned_sql .= empty( $subassigned_sql ) ? $l->ID : ( ",".$l->ID );
-                        }
+            if ( isset( $post_fields[$query_key]["type"] ) && $post_fields[$query_key]["type"] === "connection" ) {
+
+                $connection_ids = "";
+                foreach ( $query_value as $connection ) {
+                    if ( $connection === "me" ){
+                        $contact_id = Disciple_Tools_Users::get_contact_for_user( get_current_user_id() );
+                        $l = get_post( $contact_id );
+                    } else {
+                        $l = get_post( $connection );
                     }
-                    if ( !empty( $subassigned_sql ) ){
+                    if ( $l ){
+                        $connection_ids .= empty( $connection_ids ) ? $l->ID : ( ",".$l->ID );
+                    }
+                }
+                if ( !empty( $connection_ids ) ){
+                    if ( $query_key === "subassigned" ) {
                         if ( !empty( $access_query ) && in_array( "subassigned", $combine ) ){
                             $access_query .= "OR ( from_p2p.p2p_type = 'contacts_to_subassigned' AND from_p2p.p2p_from in (" . esc_sql( $connection_ids ) .") )";
                             $connections_sql_from .= " ";

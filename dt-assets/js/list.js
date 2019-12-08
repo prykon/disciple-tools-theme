@@ -435,7 +435,9 @@
         filter.labels = [{ id:"all", name:wpApiListSettings.translations.filter_all, field: "assigned"}]
       } else if ( selectedFilterTab === "my" ){
         query.assigned_to = ["me"]
-        query.type = ["access"]
+        if( wpApiListSettings.current_post_type === "contacts" ){
+          query.type = ["access"]
+        }
         filter.labels = [{ id:"me", name:wpApiListSettings.translations.filter_my, field: "assigned"}]
       } else if ( selectedFilterTab === "oikos" ){
         query.assigned_to = ["me"]
