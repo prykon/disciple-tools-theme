@@ -202,12 +202,12 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
                     }
                 }
                 if ( is_numeric( $fields["assigned_to"] ) ||
-                     strpos( $fields["assigned_to"], "user" ) === false ){
+                    strpos( $fields["assigned_to"], "user" ) === false ){
                     $fields["assigned_to"] = "user-" . $fields["assigned_to"];
                 }
             }
             if ( $fields["type"] === "oikos" && !isset( $fields["overall_status"] ) ) {
-                    $fields["overall_status"] = 'active';
+                $fields["overall_status"] = 'active';
             }
             if ( !isset( $fields["overall_status"] ) ){
                 $current_roles = wp_get_current_user()->roles;
@@ -265,7 +265,7 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
                 }
                 //make sure the assigned to is in the right format (user-1)
                 if ( is_numeric( $fields["assigned_to"] ) ||
-                     strpos( $fields["assigned_to"], "user" ) === false ){
+                    strpos( $fields["assigned_to"], "user" ) === false ){
                     $fields["assigned_to"] = "user-" . $fields["assigned_to"];
                 }
                 $existing_contact = DT_Posts::get_post( 'contacts', $post_id, true, false );
@@ -1456,11 +1456,21 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
 
         // phpcs:disable
         // WordPress.WP.PreparedSQL.NotPrepare
-        $contacts_by_status = $wpdb->get_results( $wpdb->prepare( "
+        $all_contacts_by_status = $wpdb->get_results( $wpdb->prepare( "
             SELECT pm.meta_value, count(pm.meta_value) as count, type.meta_value as type
             FROM $wpdb->postmeta pm
             INNER JOIN $wpdb->posts a ON( a.ID = pm.post_id AND a.post_type = 'contacts' and a.post_status = 'publish' )
              " . $access_sql . "
+            INNER JOIN $wpdb->postmeta as type ON ( a.ID=type.post_id AND type.meta_key = 'type' )
+            WHERE pm.meta_key = %s
+            AND pm.post_id NOT IN ( $user_posts )
+            GROUP BY pm.meta_value, type.meta_value
+        ", esc_sql( 'overall_status' ) ), ARRAY_A );
+        $my_contacts_by_status = $wpdb->get_results( $wpdb->prepare( "
+            SELECT pm.meta_value, count(pm.meta_value) as count, type.meta_value as type
+            FROM $wpdb->postmeta pm
+            INNER JOIN $wpdb->posts a ON( a.ID = pm.post_id AND a.post_type = 'contacts' and a.post_status = 'publish' )
+             " . $my_access . "
             INNER JOIN $wpdb->postmeta as type ON ( a.ID=type.post_id AND type.meta_key = 'type' )
             WHERE pm.meta_key = %s
             AND pm.post_id NOT IN ( $user_posts )
@@ -1490,12 +1500,11 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
             "my_oikos" => 0
         ];
 
-        foreach ( $contacts_by_status as $value ){
-            if ( $value["meta_value"] === "closed" && !$show_closed ){
+        foreach ( $my_contacts_by_status as $value ) {
+            if ( $value["meta_value"] === "closed" && !$show_closed ) {
                 continue;
             }
-            $numbers["total_all"] += (int) $value["count"];
-            switch ( $value["type"] ){
+            switch ($value["type"]) {
                 case "access":
                     $numbers["total_my"] += $value["count"];
                     break;
@@ -1503,6 +1512,13 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
                     $numbers["my_oikos"] += $value["count"];
                     break;
             }
+        }
+        $sub_values = $tab == "all" ? $all_contacts_by_status : $my_contacts_by_status;
+        foreach ( $sub_values as $value ){
+            if ( $value["meta_value"] === "closed" && !$show_closed ) {
+                continue;
+            }
+            $numbers["total_all"] += (int)$value["count"];
             if ( ( $tab === 'oikos' && $value["type"] === "oikos" ) || ( $tab === "my" && $value["type"] == "access" ) || ( $tab !== "oikos" && $tab !== "my" ) ) {
                 switch ($value["meta_value"]) {
                     case "active":
