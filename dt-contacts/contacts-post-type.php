@@ -546,11 +546,11 @@ class Disciple_Tools_Contact_Post_Type
             'default'     => [
                 'user'     => [
                     "label" => _x( 'User', 'Type of contact label', 'disciple_tools' ),
-                    "description" => __( 'This is someone who logs in to D.T', 'Type of contact label', 'disciple_tools' )
+                    "description" => _x( 'This is someone who logs in to D.T', 'Type of contact label', 'disciple_tools' )
                 ],
                 'access'    => [
                     "label" => _x( 'Access', 'Type of contact label', 'disciple_tools' ),
-                    "description" => __( 'From an access strategy like media, websites, camps or events', 'disciple_tools' )
+                    "description" => _x( 'From an access strategy like media, websites, camps or events', 'Type of contact label', 'disciple_tools' )
                 ],
                 'oikos' => [
                     "label" => _x( 'Personal Oikos', 'Type of contact label', 'disciple_tools' ),
