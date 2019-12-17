@@ -1368,7 +1368,7 @@ class Disciple_Tools_Contacts extends Disciple_Tools_Posts
             LEFT JOIN $wpdb->postmeta type ON ( type.post_id = pm.post_id AND type.meta_key = 'type' )
             WHERE pm.meta_key = 'seeker_path'
             AND (
-                pm.post_id IN ( SELECT post_id FROM wp_postmeta WHERE meta_key = 'assigned_to' AND meta_value = CONCAT( 'user-', %s ) ) 
+                pm.post_id IN ( SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'assigned_to' AND meta_value = CONCAT( 'user-', %s ) ) 
                 OR pm.post_id IN ( SELECT p2p_to from $wpdb->p2p WHERE p2p_from = %s AND p2p_type = 'contacts_to_subassigned' )
             )
             GROUP BY type.meta_value, status.meta_value, pm.meta_value
