@@ -781,6 +781,7 @@ class Disciple_Tools_Posts
             foreach ( $other_search_fields as $field ){
                 $meta_query .= " OR ( search.meta_key LIKE '" . esc_sql( $field ) . "' AND search.meta_value LIKE '%%" . esc_sql( $search ) . "%%'   ) ";
             }
+            $meta_query .= " OR ( wp_posts.ID IN ( SELECT comment_post_ID FROM wp_comments WHERE comment_content LIKE '%%" . esc_sql( $search ) . "%%' ) ) ";
             $meta_query .= " ) ";
 
         }
