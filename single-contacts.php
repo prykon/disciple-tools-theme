@@ -410,7 +410,7 @@ if ( ! current_user_can( 'access_contacts' ) ) {
                                             <img class="help-icon" src="<?php echo esc_html( get_template_directory_uri() . '/dt-assets/images/help.svg' ) ?>"/>
                                         </button>
                                     </div>
-                                    <div class="small button-group" style="display: inline-block">
+                                    <div class="small button-group">
                                         <?php foreach ( $contact_fields["milestones"]["default"] as $option_key => $option_value ): ?>
                                             <?php
                                             $class = ( in_array( $option_key, $contact["milestones"] ?? [] ) ) ?

@@ -318,7 +318,7 @@ if ( ! current_user_can( 'access_groups' ) ) {
                                                     <?php endforeach; ?>
                                                 </select>
                                             <?php elseif ( $field["type"] === "multi_select" ) : ?>
-                                                <div class="small button-group" style="display: inline-block">
+                                                <div class="small button-group">
                                                     <?php foreach ( $group_fields[$field_key]["default"] as $option_key => $option_value ): ?>
                                                         <?php
                                                         $class = ( in_array( $option_key, $group[$field_key] ?? [] ) ) ?

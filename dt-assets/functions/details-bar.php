@@ -62,8 +62,8 @@ function dt_print_details_bar(
                             <?php endif; ?>
                         </div>
                     </div>
-                    <div class="cell small-4 center hide-for-small-only">
-                        <strong><?php the_title_attribute(); ?></strong>
+                    <div class="cell small-4 center hide-for-small-only" style="display: flex; align-items: center; justify-content: center">
+                       <strong><?php the_title_attribute(); ?></strong>
                     </div>
                     <div class="cell small-4 align-right grid-x grid-margin-x">
                         <?php if ( $task ) : ?>
