@@ -8,7 +8,7 @@ class Disciple_Tools_Migration_0028 extends Disciple_Tools_Migration {
             from information_schema.statistics
             where table_schema = %s
             and table_name = '{$wpdb->prefix}dt_post_user_meta'
-            and index_name like %s 
+            and index_name like %s
         ", DB_NAME, 'meta_key_index' ));
         if ( $meta_key_index_exists === 0 ){
             $alter = $wpdb->query( "
@@ -38,7 +38,7 @@ class Disciple_Tools_Migration_0028 extends Disciple_Tools_Migration {
         $charset_collate = $wpdb->get_charset_collate();
         return array(
             "{$wpdb->prefix}dt_post_user_meta" =>
-                "CREATE TABLE `{$wpdb->prefix}dt_post_user_meta` (
+                "CREATE TABLE IF NOT EXISTS  `{$wpdb->prefix}dt_post_user_meta` (
                     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                     `user_id` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
                     `post_id` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',

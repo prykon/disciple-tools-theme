@@ -8,7 +8,7 @@ class Disciple_Tools_Migration_0026 extends Disciple_Tools_Migration {
                 from information_schema.statistics
                 where table_schema = %s
                 and table_name = '$wpdb->dt_activity_log'
-                and index_name like %s 
+                and index_name like %s
             ", DB_NAME, 'meta_key_index' ));
         if ( $meta_key_index_exists === 0 ){
             $wpdb->query( "ALTER TABLE `{$wpdb->prefix}dt_activity_log` ADD INDEX meta_key_index (meta_key)" );
@@ -31,7 +31,7 @@ class Disciple_Tools_Migration_0026 extends Disciple_Tools_Migration {
 
         return array(
             "{$wpdb->prefix}dt_activity_log" =>
-                "CREATE TABLE `{$wpdb->prefix}dt_activity_log` (
+                "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}dt_activity_log` (
                     `histid` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                     `user_caps` varchar(70) NOT NULL DEFAULT 'guest',
                     `action` varchar(255) NOT NULL,

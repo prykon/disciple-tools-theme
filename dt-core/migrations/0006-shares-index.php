@@ -22,7 +22,7 @@ class Disciple_Tools_Migration_0006 extends Disciple_Tools_Migration {
 
         return array(
             "{$wpdb->prefix}dt_share" =>
-                "CREATE TABLE `{$wpdb->prefix}dt_share` (
+                "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}dt_share` (
                     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                     `user_id` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
                     `post_id` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',

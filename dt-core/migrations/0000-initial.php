@@ -44,7 +44,7 @@ class Disciple_Tools_Migration_0000 extends Disciple_Tools_Migration {
         $charset_collate = $wpdb->get_charset_collate();
         return array(
             "{$wpdb->prefix}dt_activity_log" =>
-                "CREATE TABLE `{$wpdb->prefix}dt_activity_log` (
+                "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}dt_activity_log` (
                     `histid` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                     `user_caps` varchar(70) NOT NULL DEFAULT 'guest',
                     `action` varchar(255) NOT NULL,
@@ -63,7 +63,7 @@ class Disciple_Tools_Migration_0000 extends Disciple_Tools_Migration {
                     PRIMARY KEY (`histid`)
                 ) $charset_collate;",
             "{$wpdb->prefix}dt_reports" =>
-                "CREATE TABLE `{$wpdb->prefix}dt_reports` (
+                "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}dt_reports` (
                     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                     `report_date` DATE NOT NULL,
                     `report_source` VARCHAR(55) NOT NULL,
@@ -73,7 +73,7 @@ class Disciple_Tools_Migration_0000 extends Disciple_Tools_Migration {
                     PRIMARY KEY (`id`)
             ) $charset_collate;",
             "{$wpdb->prefix}dt_reportmeta" =>
-                "CREATE TABLE `{$wpdb->prefix}dt_reportmeta` (
+                "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}dt_reportmeta` (
                     `meta_id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                     `report_id` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
                     `meta_key` VARCHAR(255) NOT NULL,
@@ -81,7 +81,7 @@ class Disciple_Tools_Migration_0000 extends Disciple_Tools_Migration {
                     PRIMARY KEY (`meta_id`)
             ) $charset_collate;",
             "{$wpdb->prefix}dt_share" =>
-                "CREATE TABLE `{$wpdb->prefix}dt_share` (
+                "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}dt_share` (
                     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                     `user_id` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
                     `post_id` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
@@ -89,7 +89,7 @@ class Disciple_Tools_Migration_0000 extends Disciple_Tools_Migration {
                     PRIMARY KEY (`id`)
             ) $charset_collate;",
             "{$wpdb->prefix}dt_notifications" =>
-                "CREATE TABLE `{$wpdb->prefix}dt_notifications` (
+                "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}dt_notifications` (
                     `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                     `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
                     `source_user_id` bigint(20) UNSIGNED NOT NULL DEFAULT '0',

@@ -24,7 +24,7 @@ class Disciple_Tools_Migration_0001 extends Disciple_Tools_Migration {
 
         return array(
             "{$wpdb->prefix}dt_activity_log" =>
-                "CREATE TABLE `{$wpdb->prefix}dt_activity_log` (
+                "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}dt_activity_log` (
                     `histid` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                     `user_caps` varchar(70) NOT NULL DEFAULT 'guest',
                     `action` varchar(255) NOT NULL,

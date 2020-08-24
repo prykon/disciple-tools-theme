@@ -24,7 +24,7 @@ class Disciple_Tools_Migration_0002 extends Disciple_Tools_Migration {
 
         return array(
             "{$wpdb->prefix}dt_notifications" =>
-                "CREATE TABLE `{$wpdb->prefix}dt_notifications` (
+                "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}dt_notifications` (
                     `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                     `user_id` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
                     `source_user_id` bigint(20) UNSIGNED NOT NULL DEFAULT '0',

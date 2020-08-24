@@ -35,7 +35,7 @@ class Disciple_Tools_Migration_0025 extends Disciple_Tools_Migration {
         $charset_collate = $wpdb->get_charset_collate();
         return array(
             "{$wpdb->prefix}dt_post_user_meta" =>
-                "CREATE TABLE `{$wpdb->prefix}dt_post_user_meta` (
+                "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}dt_post_user_meta` (
                     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
                     `user_id` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
                     `post_id` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
