@@ -68,36 +68,6 @@ class P2P_CLI_Command extends WP_CLI_Command {
 		return $count;
 	}
 
-	/**
-	 * Set up the example connections.
-	 *
-	 * @subcommand setup-example
-	 */
-	function setup_example() {
-		$ctype = p2p_type( 'actor_movie' );
-
-		$data = array(
-			'Nicholas Cage' => array( 'Lord Of War', 'Adaptation' ),
-			'Jude Law' => array( 'Sherlock Holmes' ),
-			'Brad Pitt' => array( '7 Years In Tibet', 'Fight Club' ),
-			'Natalie Portman' => array( 'Black Swan', 'Thor' ),
-			'Matt Damon' => array( 'The Talented Mr. Ripley' ),
-			'Charlize Theron' => array(),
-		);
-
-		foreach ( $data as $actor_name => $movies ) {
-			$actor = self::titled_post( 'actor',  $actor_name );
-
-			foreach ( $movies as $movie_title ) {
-				$movie = self::titled_post( 'movie', $movie_title );
-
-				$ctype->connect( $actor, $movie );
-			}
-		}
-
-		WP_CLI::success( "Set up the actors and movies example." );
-	}
-
 	private static function titled_post( $type, $title ) {
 		return wp_insert_post( array(
 			'post_type' => $type,
