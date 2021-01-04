@@ -1,7 +1,7 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly
 
-class Disciple_Tools_Hook_Comments extends Disciple_Tools_Hook_Base {
+class Disciple_Tools_Hook_Comments {
 
     protected function _add_comment_log( $id, $action, $comment = null ) {
         if ( is_null( $comment ) ) {

@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly
 /**
  * Class Disciple_Tools_Hook_Posts
  */
-class Disciple_Tools_Hook_Posts extends Disciple_Tools_Hook_Base {
+class Disciple_Tools_Hook_Posts {
 
     public function __construct() {
         add_action( 'wp_insert_post', [ &$this, 'hooks_new_post' ], 10, 3 );

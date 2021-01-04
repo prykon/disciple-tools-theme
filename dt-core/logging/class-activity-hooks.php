@@ -36,9 +36,6 @@ class Disciple_Tools_Activity_Hooks {
      * Disciple_Tools_Activity_Hooks constructor.
      */
     public function __construct() {
-        // Load abstract class.
-        include( 'hooks/abstract-class-hook-base.php' );
-
         // Load all our hooks.
         include( 'hooks/class-hook-user.php' );
         include( 'hooks/class-hook-posts.php' );

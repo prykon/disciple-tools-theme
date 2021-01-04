@@ -1,7 +1,7 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly
 
-class Disciple_Tools_Hook_User extends Disciple_Tools_Hook_Base {
+class Disciple_Tools_Hook_User {
 
     public function __construct() {
         add_action( 'wp_login', [ &$this, 'hooks_wp_login' ], 10, 2 );
