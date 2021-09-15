@@ -180,6 +180,7 @@ class Disciple_Tools_Tab_Featured_Extensions extends Disciple_Tools_Abstract_Men
                 $plugin->icon = ! isset( $plugin->icon ) ? 'https://s.w.org/plugins/geopattern-icon/' . $plugin->slug . '.svg' : $plugin->icon;
                 $plugin->name = str_replace( "Disciple Tools - ", "", $plugin->name );
                 $plugin->name = str_replace( "Disciple.Tools - ", "", $plugin->name );
+                $plugin->name = str_replace( " Plugin", "", $plugin->name );
                 ?>
             <div class="plugin-card plugin-card-classic-editor">
                             <div class="plugin-card-top">
