@@ -11,7 +11,7 @@ class DT_Theme_Customizer {
 	public function __construct() {
 		add_action( 'wp_head', [ $this, 'dt_custom_css' ] );
 		add_action( 'customize_register', [ $this, 'register_customize_sections' ] );
-		add_action( 'customize_preview_init', [ $this, 'dt_customizer_live_preview' ] );
+		add_action( 'wp_enqueue_scripts', [ $this, 'dt_customizer_live_preview' ] );
 	}
 
 	public function register_customize_sections( $wp_customize ) {
@@ -45,6 +45,13 @@ class DT_Theme_Customizer {
 		$wp_customize->add_setting( 'dt_navbar_color', 
 			array(
 				'default' => '#3f729b',
+				'transport' => 'postMessage'
+			)
+		);
+
+		$wp_customize->add_setting( 'dt_navbar_second_color', 
+			array(
+				'default' => '#ffffff',
 				'transport' => 'postMessage'
 			)
 		);
@@ -110,6 +117,14 @@ class DT_Theme_Customizer {
 			)
 		) );
 
+		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'navbar-second-color',
+			array(
+				'label' => 'Edit second navbar color',
+				'section' => 'dt_colors_section',
+				'settings' => 'dt_navbar_second_color'
+			)
+		) );
+
 		$wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'navbar-text-color',
 			array(
 				'label' => 'Edit navbar text color',
@@ -163,7 +178,10 @@ class DT_Theme_Customizer {
 		?>
 		<style id="dt-custom-css">
 			body { background-color: <?php echo strip_tags( get_theme_mod( 'dt_background_color' ) ); ?>; }
-			.top-bar { background-color: <?php echo strip_tags( get_theme_mod( 'dt_navbar_color' ) ); ?>; }
+			.top-bar { 
+				background-color: <?php echo strip_tags( get_theme_mod( 'dt_navbar_color' ) ); ?>;
+				border-color: <?php echo strip_tags( get_theme_mod( 'dt_navbar_color' ) ); ?>;
+			}
 			.top-bar ul { background-color: <?php echo strip_tags( get_theme_mod( 'dt_navbar_color' ) ); ?>; }
 			.title-bar { background-color: <?php echo strip_tags( get_theme_mod( 'dt_navbar_color' ) ); ?>; }
 			#top-bar-menu .dropdown.menu a {
@@ -176,20 +194,34 @@ class DT_Theme_Customizer {
 				filter: brightness(0.75);
 			}
 			#top-bar-menu .dropdown.menu a:hover { background-color: <?php echo strip_tags( get_theme_mod( 'dt_navbar_color_hover' ) ); ?>; }
+			.is-submenu-item .is-dropdown-submenu-item { background-color: red !important; }
+			nav.second-bar { background-color: <?php echo strip_tags( get_theme_mod( 'dt_navbar_second_color' ) ); ?> }
+			.list_field_picker { background-color: <?php echo strip_tags( get_theme_mod( 'dt_navbar_second_color' ) ); ?> !important }
+			#bulk_edit_picker { background-color: <?php echo strip_tags( get_theme_mod( 'dt_navbar_second_color' ) ); ?> !important }
 			.button {
 				background-color: <?php echo strip_tags( get_theme_mod( 'dt_primary_button_color' ) ); ?>;
 				color: <?php echo strip_tags( get_theme_mod( 'dt_primary_button_text_color' ) ); ?>;
 			}
-			.section-header {color: <?php echo strip_tags( get_theme_mod( 'dt_primary_button_color' ) ); ?>; }
+			.current-filter{
+				background-color: <?php echo strip_tags( get_theme_mod( 'dt_primary_button_color' ) ); ?>30;
+				border-color: <?php echo strip_tags( get_theme_mod( 'dt_primary_button_color' ) ); ?>;
+			}
+			.section-header { color: <?php echo strip_tags( get_theme_mod( 'dt_primary_button_color' ) ); ?>; }
 			.bordered-box {
 				background-color: <?php echo strip_tags( get_theme_mod( 'dt_tile_background_color' ) ); ?>;
 				border-color: <?php echo strip_tags( get_theme_mod( 'dt_tile_border_color' ) ); ?>;
 			}
+			.dropdown.menu>li>a {
+				background-color: <?php echo strip_tags( get_theme_mod( 'dt_tile_background_color' ) ); ?>;
+			}
+			a { color: <?php echo strip_tags( get_theme_mod( 'dt_primary_button_color' ) ); ?>; }
 			.accordion-title{
 				background-color: <?php echo strip_tags( get_theme_mod( 'dt_primary_button_color' ) ); ?> !important;
 				color: <?php echo strip_tags( get_theme_mod( 'dt_primary_button_text_color' ) ); ?> !important;
+				opacity: 0.75;
 				border: none;
 			}
+			.is-active a{filter: none;}
 			.accordion-content{
 				background-color: <?php echo strip_tags( get_theme_mod( 'dt_tile_background_color' ) ); ?>;
 				border: none;
@@ -200,6 +232,6 @@ class DT_Theme_Customizer {
 	}
 
 	public function dt_customizer_live_preview() {
-		wp_enqueue_script( 'dt_theme_customizer', get_template_directory_uri() . '/dt-assets/js/theme-customizer.js', [ 'jquery' ], true );
+		wp_enqueue_script( 'dt_theme_customizer', get_template_directory_uri() . '/dt-assets/js/theme-customizer.js', [ 'jquery', 'customize-preview' ], true );
 	}
 }
