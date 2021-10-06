@@ -195,7 +195,12 @@ else {
                 require_once( 'dt-assets/functions/details-bar.php' ); // Breadcrumbs bar
             }
 
-
+            /**
+             * Theme Customizer
+             */
+            require_once( 'dt-assets/functions/customizer.php');
+            new DT_Theme_Customizer();
+            
             /**
              * URL loader
              */
