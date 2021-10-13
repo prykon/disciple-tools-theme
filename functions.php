@@ -198,9 +198,9 @@ else {
             /**
              * Theme Customizer
              */
-            require_once( 'dt-assets/functions/customizer.php');
+            require_once( 'dt-assets/functions/customizer.php' );
             new DT_Theme_Customizer();
-            
+
             /**
              * URL loader
              */
