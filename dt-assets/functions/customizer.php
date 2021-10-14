@@ -213,12 +213,12 @@ class DT_Theme_Customizer {
             'dt_tile_background_color' => '#f7f3e3'
         ];
         $color_themes['soft_drink_cup'] = [
-            'dt_background_color' => '#006a5e',
+            'dt_background_color' => '#ffffff',
             'dt_background_image' => 'https://99percentinvisible.org/app/uploads/2019/07/solo-jaz.jpg',
             'dt_navbar_color' => '#f72585',
-            'dt_navbar_second_color' => '#16c7b2',
+            'dt_navbar_second_color' => '#05c4c6',
             'dt_primary_button_color' => '#3d0066',
-            'dt_primary_button_text_color' => '#16c7b2',
+            'dt_primary_button_text_color' => '#05c4c6',
             'dt_tile_background_color' => '#dec9e9'
         ];
         $color_themes['hasta_la_vista'] = [
