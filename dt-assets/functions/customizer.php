@@ -49,8 +49,9 @@ class DT_Theme_Customizer {
             'type'    => 'select',
             'choices' => array(
                 'default' => 'Disciple.Tools Default',
-                'poster_boy' => 'Poster Boy',
+                'disciple_toogles' => 'Disciple.Toogles',
                 'latte_art' => 'Latte Art',
+                'poster_boy' => 'Poster Boy',
                 'soft_drink_cup' => 'Soft Drink Cup',
                 'hasta_la_vista' => 'Hasta la Vista',
                 'watermelone' => 'Watermelone',
@@ -196,13 +197,13 @@ class DT_Theme_Customizer {
             'dt_primary_button_text_color' => '#a8dadc',
             'dt_tile_background_color' => '#fefefe'
         ];
-        $color_themes['poster_boy'] = [
-            'dt_background_color' => '#1d3557',
-            'dt_navbar_color' => '#e63946',
-            'dt_navbar_second_color' => '#f9e6b1',
-            'dt_primary_button_color' => '#457b9d',
-            'dt_primary_button_text_color' => '#a8dadc',
-            'dt_tile_background_color' => '#f1faee'
+        $color_themes['disciple_toogles'] = [
+            'dt_background_color' => '#f3f3f3',
+            'dt_navbar_color' => '#1267d3',
+            'dt_navbar_second_color' => '#e8f0fe',
+            'dt_primary_button_color' => '#009933',
+            'dt_primary_button_text_color' => '#ffffff',
+            'dt_tile_background_color' => '#ffffff'
         ];
         $color_themes['latte_art'] = [
             'dt_background_color' => '#333333',
@@ -211,6 +212,14 @@ class DT_Theme_Customizer {
             'dt_primary_button_color' => '#000000',
             'dt_primary_button_text_color' => '#fefefe',
             'dt_tile_background_color' => '#f7f3e3'
+        ];
+        $color_themes['poster_boy'] = [
+            'dt_background_color' => '#1d3557',
+            'dt_navbar_color' => '#e63946',
+            'dt_navbar_second_color' => '#f9e6b1',
+            'dt_primary_button_color' => '#457b9d',
+            'dt_primary_button_text_color' => '#a8dadc',
+            'dt_tile_background_color' => '#f1faee'
         ];
         $color_themes['soft_drink_cup'] = [
             'dt_background_color' => '#ffffff',
