@@ -49,6 +49,7 @@ class DT_Theme_Customizer {
             'type'    => 'select',
             'choices' => array(
                 'default' => 'Disciple.Tools Default',
+                'dark_mode' => 'Dark Mode',
                 'disciple_toogles' => 'Disciple.Toogles',
                 'latte_art' => 'Latte Art',
                 'poster_boy' => 'Poster Boy',
@@ -75,7 +76,7 @@ class DT_Theme_Customizer {
         $wp_customize->add_section( 'dt_colors_section',
             array(
                 'title' => 'Colors',
-                'description' => 'Edit the colors for the Disciple.Tools theme elements.'
+                'description' => 'Edit the colors for the Disciple.Tools theme elements.<br><br><img src="' . esc_html( get_template_directory_uri() . '/dt-assets/images/broken.svg' ) .'"> <b>Important:</b> In order to see your custom color theme, make sure the \'custom\' theme is selected in the Color Themes menu.'
             )
         );
 
@@ -189,6 +190,15 @@ class DT_Theme_Customizer {
     public function dt_custom_css() {
         $selected_color_theme = get_theme_mod( 'dt_color_theme_name' );
 
+        $color_themes['custom'] = [
+            'dt_background_color' => get_theme_mod( 'dt_background_color' ),
+            'dt_background_image' => get_theme_mod( 'dt_background_image' ),
+            'dt_navbar_color' => get_theme_mod( 'dt_navbar_color' ),
+            'dt_navbar_second_color' => get_theme_mod( 'dt_navbar_second_color' ),
+            'dt_primary_button_color' => get_theme_mod( 'dt_primary_button_color' ),
+            'dt_primary_button_text_color' => get_theme_mod( 'dt_primary_button_text_color' ),
+            'dt_tile_background_color' => get_theme_mod( 'dt_tile_background_color' ),
+        ];
         $color_themes['default'] = [
             'dt_background_color' => '#e2e2e2',
             'dt_navbar_color' => '#3f729b',
@@ -204,6 +214,14 @@ class DT_Theme_Customizer {
             'dt_primary_button_color' => '#009933',
             'dt_primary_button_text_color' => '#ffffff',
             'dt_tile_background_color' => '#ffffff'
+        ];
+        $color_themes['dark_mode'] = [
+            'dt_background_color' => '#0d1117',
+            'dt_navbar_color' => '#161b22',
+            'dt_navbar_second_color' => '#21262c',
+            'dt_primary_button_color' => '#21262c',
+            'dt_primary_button_text_color' => '#585c60',
+            'dt_tile_background_color' => '#585c60'
         ];
         $color_themes['latte_art'] = [
             'dt_background_color' => '#333333',
@@ -227,7 +245,7 @@ class DT_Theme_Customizer {
             'dt_navbar_color' => '#f72585',
             'dt_navbar_second_color' => '#05c4c6',
             'dt_primary_button_color' => '#3d0066',
-            'dt_primary_button_text_color' => '#05c4c6',
+            'dt_primary_button_text_color' => '#ffffff',
             'dt_tile_background_color' => '#dec9e9'
         ];
         $color_themes['hasta_la_vista'] = [
@@ -368,6 +386,8 @@ class DT_Theme_Customizer {
                 background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_tile_background_color'] ); ?>;
                 border-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_tile_background_color'] ); ?>30;
             }
+            .callout { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_tile_background_color'] ); ?>; }
+            .left-border-grey { border-left: 1px solid <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>75; }
             tbody {
                 background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_tile_background_color'] ); ?>;
                 border: 1px solid <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_tile_background_color'] ); ?>30;
