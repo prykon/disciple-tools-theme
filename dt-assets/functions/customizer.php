@@ -38,17 +38,17 @@ class DT_Theme_Customizer {
         );
 
         $wp_customize->add_control( new WP_Customize_Control(
-            $wp_customize, //Pass the $wp_customize object (required)
-            'parsmizban_theme_name', //Set a unique ID for the control
+            $wp_customize,
+            'disciple_tools_theme',
             array(
-            'label'      => __( 'Select Color Theme', 'disciple_tools' ), //Admin-visible name of the control
+            'label'      => __( 'Select Color Theme', 'disciple_tools' ),
             'description' => __( 'Using this option you can change the theme colors for your Disciple.Tools instance.', 'disciple_tools' ),
-            'settings'   => 'dt_color_theme_name', //Which setting to load and manipulate (serialized is okay)
-            'priority'   => 10, //Determines the order this control appears in for the specified section
-            'section'    => 'dt_color_themes', //ID of the section this control should render in (can be one of yours, or a WordPress default section)
+            'settings'   => 'dt_color_theme_name',
+            'priority'   => 10,
+            'section'    => 'dt_color_themes',
             'type'    => 'select',
             'choices' => array(
-                'default' => 'Disciple.Tools Default',
+                'default' => 'Default',
                 'dark_mode' => 'Dark Mode',
                 'disciple_toogles' => 'Disciple.Toogles',
                 'latte_art' => 'Latte Art',
@@ -62,7 +62,7 @@ class DT_Theme_Customizer {
                 'motel_art' => 'Motel Art',
                 'viva_la_raza' => 'Viva la Raza',
                 'africa_forever' => 'Africa Forever',
-                'custom' => '(custom)',
+                'custom' => '(Custom)',
                 )
             )
         ) );
