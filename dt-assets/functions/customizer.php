@@ -214,6 +214,7 @@ class DT_Theme_Customizer {
         ];
         $color_themes['soft_drink_cup'] = [
             'dt_background_color' => '#006a5e',
+            'dt_background_image' => 'https://99percentinvisible.org/app/uploads/2019/07/solo-jaz.jpg',
             'dt_navbar_color' => '#f72585',
             'dt_navbar_second_color' => '#16c7b2',
             'dt_primary_button_color' => '#3d0066',
@@ -260,15 +261,6 @@ class DT_Theme_Customizer {
             'dt_primary_button_color' => '#000000',
             'dt_primary_button_text_color' => '#9ff100',
             'dt_tile_background_color' => '#adadad'
-        ];
-        $color_themes['motel_art'] = [
-            'dt_background_color' => '#68B0AB',
-            'dt_background_image' => 'https://www.wowpatterns.com/assets/files/resource_images/spring-green-leaves-background-pattern.jpg',
-            'dt_navbar_color' => '#645b47',
-            'dt_navbar_second_color' => '#d1d1c1',
-            'dt_primary_button_color' => '#7eb89f',
-            'dt_primary_button_text_color' => '#000000',
-            'dt_tile_background_color' => '#ffffff'
         ];
         $color_themes['motel_art'] = [
             'dt_background_color' => '#68B0AB',
