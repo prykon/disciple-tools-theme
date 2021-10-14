@@ -60,7 +60,7 @@ class DT_Theme_Customizer {
                 'joy_to_the_world' => 'Joy to the World',
                 'routing_thomas' => 'Routing Thomas',
                 'motel_art' => 'Motel Art',
-                'viva_la_raza' => 'Viva la Raza',
+                'viva_la_raza' => '¡Viva la Raza!',
                 'africa_forever' => 'Africa Forever',
                 'custom' => '(Custom)',
                 )
@@ -250,7 +250,7 @@ class DT_Theme_Customizer {
         ];
         $color_themes['hasta_la_vista'] = [
             'dt_background_color' => '#0b090a',
-            'dt_background_image' => 'https://images.squarespace-cdn.com/content/v1/55ab1d9ce4b0e800df5d662d/1523350781207-AFRZ5KUZJN3SHWU32R6A/Dark+Concrete+Wallpaper.jpg',
+            'dt_background_image' => 'https://cdn.pixabay.com/photo/2015/09/10/14/14/scratched-934483_960_720.jpg',
             'dt_navbar_color' => '#660708',
             'dt_navbar_second_color' => '#e5383b',
             'dt_primary_button_color' => '#a4161a',
@@ -300,7 +300,7 @@ class DT_Theme_Customizer {
         ];
         $color_themes['viva_la_raza'] = [
             'dt_background_color' => '#56d69f',
-            'dt_background_image' => 'https://cdn.pixabay.com/photo/2016/11/15/23/14/emerald-1827808__640.jpg',
+            'dt_background_image' => 'https://cdn.pixabay.com/photo/2016/11/15/23/14/emerald-1827808_1280.jpg',
             'dt_navbar_color' => '#ee4266',
             'dt_navbar_second_color' => '#ffd23f',
             'dt_primary_button_color' => '#540d6e',
@@ -323,11 +323,11 @@ class DT_Theme_Customizer {
                 background-repeat: no-repeat;
                 margin-right: 20px;
             }
-            .logo { visibility: hidden; }
-            /*body { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_background_color'] ); ?>; }*/
             body {
                 background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_background_color'] ); ?>;
                 background-image: url('<?php echo esc_attr( $color_themes[$selected_color_theme]['dt_background_image'] ); ?>');
+                background-attachment: fixed;
+                background-size: cover;
             }
             .top-bar { 
                 background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_navbar_color'] ); ?>;
