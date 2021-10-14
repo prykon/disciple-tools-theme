@@ -57,7 +57,10 @@ class DT_Theme_Customizer {
                 'pumpkin_pie' => 'Pumpkin Pie',
                 'joy_to_the_world' => 'Joy to the World',
                 'routing_thomas' => 'Routing Thomas',
+                'motel_art' => 'Motel Art',
+                'viva_la_raza' => 'Viva la Raza',
                 'custom' => '(custom)',
+                'testing' => 'Testing',
             )
             )
         ) );
@@ -209,14 +212,6 @@ class DT_Theme_Customizer {
             'dt_primary_button_text_color' => '#fefefe',
             'dt_tile_background_color' => '#f7f3e3'
         ];
-        $color_themes['latte_art'] = [
-            'dt_background_color' => '#333333',
-            'dt_navbar_color' => '#bd8a49',
-            'dt_navbar_second_color' => '#f9e6b1',
-            'dt_primary_button_color' => '#000000',
-            'dt_primary_button_text_color' => '#fefefe',
-            'dt_tile_background_color' => '#f7f3e3'
-        ];
         $color_themes['soft_drink_cup'] = [
             'dt_background_color' => '#006a5e',
             'dt_navbar_color' => '#f72585',
@@ -266,13 +261,32 @@ class DT_Theme_Customizer {
             'dt_primary_button_text_color' => '#9ff100',
             'dt_tile_background_color' => '#adadad'
         ];
-        $color_themes['testing'] = [
-            'dt_background_color' => '#000000',
-            'dt_navbar_color' => '#5519a1',
-            'dt_navbar_second_color' => '#9ff100',
-            'dt_primary_button_color' => '#000000',
-            'dt_primary_button_text_color' => '#9ff100',
-            'dt_tile_background_color' => '#adadad'
+        $color_themes['motel_art'] = [
+            'dt_background_color' => '#68B0AB',
+            'dt_background_image' => 'https://www.wowpatterns.com/assets/files/resource_images/spring-green-leaves-background-pattern.jpg',
+            'dt_navbar_color' => '#645b47',
+            'dt_navbar_second_color' => '#d1d1c1',
+            'dt_primary_button_color' => '#7eb89f',
+            'dt_primary_button_text_color' => '#000000',
+            'dt_tile_background_color' => '#ffffff'
+        ];
+        $color_themes['motel_art'] = [
+            'dt_background_color' => '#68B0AB',
+            'dt_background_image' => 'https://www.wowpatterns.com/assets/files/resource_images/spring-green-leaves-background-pattern.jpg',
+            'dt_navbar_color' => '#645b47',
+            'dt_navbar_second_color' => '#d1d1c1',
+            'dt_primary_button_color' => '#7eb89f',
+            'dt_primary_button_text_color' => '#000000',
+            'dt_tile_background_color' => '#ffffff'
+        ];
+        $color_themes['viva_la_raza'] = [
+            'dt_background_color' => '#56d69f',
+            'dt_background_image' => 'https://cdn.pixabay.com/photo/2016/11/15/23/14/emerald-1827808__640.jpg',
+            'dt_navbar_color' => '#ee4266',
+            'dt_navbar_second_color' => '#ffd23f',
+            'dt_primary_button_color' => '#540d6e',
+            'dt_primary_button_text_color' => '#3bceac',
+            'dt_tile_background_color' => '#eae2b7'
         ];
         ?>
         <style id="dt-custom-css">
@@ -308,7 +322,7 @@ class DT_Theme_Customizer {
                 background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_navbar_second_color'] ); ?>;
             }
             #top-bar-menu .top-bar-left .dropdown.menu a:hover {
-                background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_navbar_second_color'] ); ?>;
+                background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>;
             }
             nav.second-bar { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_navbar_second_color'] ); ?> }
             .list_field_picker { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_navbar_second_color'] ); ?> !important }
@@ -367,6 +381,8 @@ class DT_Theme_Customizer {
                 opacity: 0.75;
                 border: none;
             }
+            .day-activities__title { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?> }
+            .activity__more-link { color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?> }
             .is-active a{filter: none;}
             .accordion-content{
                 background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_tile_background_color'] ); ?>;
