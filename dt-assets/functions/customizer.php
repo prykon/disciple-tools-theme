@@ -198,14 +198,6 @@ class DT_Theme_Customizer {
             'dt_primary_button_text_color' => get_theme_mod( 'dt_primary_button_text_color' ),
             'dt_tile_background_color' => get_theme_mod( 'dt_tile_background_color' ),
         ];
-        $color_themes['default'] = [
-            'dt_background_color' => '#e2e2e2',
-            'dt_navbar_color' => '#3f729b',
-            'dt_navbar_second_color' => '#ffffff',
-            'dt_primary_button_color' => '#3f729b',
-            'dt_primary_button_text_color' => '#c7d0d8',
-            'dt_tile_background_color' => '#161b22'
-        ];
         $color_themes['disciple_toogles'] = [
             'dt_background_color' => '#f3f3f3',
             'dt_navbar_color' => '#1267d3',
@@ -218,9 +210,10 @@ class DT_Theme_Customizer {
             'dt_background_color' => '#0d1117',
             'dt_navbar_color' => '#161b22',
             'dt_navbar_second_color' => '#21262c',
-            'dt_primary_button_color' => '#21262c',
-            'dt_primary_button_text_color' => '#585c60',
-            'dt_tile_background_color' => '#585c60'
+            'dt_text_color' => '#585c60',
+            'dt_primary_button_color' => '#585c60',
+            'dt_primary_button_text_color' => '#161b22',
+            'dt_tile_background_color' => '#21262c'
         ];
         $color_themes['latte_art'] = [
             'dt_background_color' => '#333333',
@@ -306,6 +299,11 @@ class DT_Theme_Customizer {
             'dt_primary_button_text_color' => '#3bceac',
             'dt_tile_background_color' => '#eae2b7'
         ];
+
+        if ( $selected_color_theme == 'default') {
+            return;
+        }
+
         ?>
         <style id="dt-custom-css">
             .logo-link {
@@ -319,6 +317,7 @@ class DT_Theme_Customizer {
                 background-image: url('<?php echo esc_attr( $color_themes[$selected_color_theme]['dt_background_image'] ); ?>');
                 background-attachment: fixed;
                 background-size: cover;
+                <?php if( isset( $color_themes[$selected_color_theme]['dt_text_color'] ) ) { echo esc_attr( "color: " . $color_themes[$selected_color_theme]['dt_text_color'] ) . ";"; } ?>
             }
             .top-bar { 
                 background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_navbar_color'] ); ?>;
@@ -328,7 +327,7 @@ class DT_Theme_Customizer {
             .title-bar { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_navbar_color'] ); ?>; }
             #top-bar-menu .dropdown.menu a {
                 background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_navbar_color'] ); ?>;
-                color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_tile_background_color'] ); ?>;
+                color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_text_color'] ); ?>;
             }
             .dropdown.menu>li.is-active>a { color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>;  }
             #top-bar-menu .dropdown.menu li.active>a {
@@ -414,7 +413,6 @@ class DT_Theme_Customizer {
             .accordion-menu .is-accordion-submenu-parent:not(.has-submenu-toggle)>a:after { border-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?> transparent transparent; }
             .dropdown.menu>li.is-dropdown-submenu-parent>a:after { border-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?> transparent transparent; }
             .top-bar-left { margin-bottom: -1px; }
-
         </style>
         <?php
     }
