@@ -146,7 +146,7 @@ else {
              * Prepare variables
              */
             $this->token = 'disciple_tools';
-            $this->version = '1.13.1';
+            $this->version = '1.14.1';
             // $this->migration_number = 38; // moved to Disciple_Tools_Migration_Engine::$migration_number
 
             $this->theme_url = get_template_directory_uri() . '/';
@@ -170,6 +170,7 @@ else {
             $is_rest = dt_is_rest();
             $url_path = dt_get_url_path();
             require_once( 'dt-core/libraries/posts-to-posts/posts-to-posts.php' ); // P2P library/plugin. Required before DT instance
+            require_once( 'dt-core/libraries/wp-queue/wp-queue.php' ); //w
             require_once( 'dt-core/configuration/config-site-defaults.php' ); // Force required site configurations
             require_once( 'dt-core/wp-async-request.php' ); // Async Task Processing
             require_once( 'dt-core/configuration/restrict-rest-api.php' ); // sets authentication requirement for rest end points. Disables rest for pre-wp-4.7 sites.
@@ -427,6 +428,10 @@ else {
                 require_once( 'dt-core/setup-functions.php' );
 
             }
+
+            //create scheduler for job queue
+            wp_queue()->cron();
+
             /* End Admin configuration section */
 
             require_once( 'dt-core/dependencies/deprecated-dt-functions.php' );

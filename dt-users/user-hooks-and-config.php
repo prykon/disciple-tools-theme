@@ -85,7 +85,7 @@ class DT_User_Hooks_And_Configuration {
     public function wpmu_activate_user( $user_id, $password, $meta ){
         if ( isset( $meta["invited_by"] ) && !empty( $meta["invited_by"] ) ){
             $contact_id = get_user_option( "corresponds_to_contact", $user_id );
-            if ( $contact_id && !is_wp_error( $contact_id )){
+            if ( $contact_id && !is_wp_error( $contact_id ) ){
                 DT_Posts::add_shared( "contacts", $contact_id, $meta["invited_by"], null, false, false );
             }
         }
@@ -147,7 +147,7 @@ class DT_User_Hooks_And_Configuration {
         if ( isset( $_POST["dt_locale"] ) ) {
             $userdata = get_user_by( 'id', $user_id );
 
-            if ( isset( $_POST["dt_locale"] )) {
+            if ( isset( $_POST["dt_locale"] ) ) {
                 if ( $_POST["dt_locale"] === "" ) {
                     $locale = "en_US";
                 } else {
@@ -275,7 +275,7 @@ class DT_User_Hooks_And_Configuration {
             }
         }
 
-        $message = self::common_user_invite_text( $user->user_email, $blogname, home_url(), $display_name );
+        $message = self::common_user_invite_text( $user->user_login, $blogname, home_url(), $display_name );
         $message .= __( 'To set your password, visit the following address:', 'disciple_tools' ) . "\r\n\r\n";
         $message .= home_url( "wp-login.php?action=rp&key=$key&login=" . rawurlencode( $user->user_login ), 'login' ) . "\r\n\r\n";
 
@@ -481,7 +481,7 @@ class DT_User_Hooks_And_Configuration {
                         <input type="hidden" class="regular-text corresponds_to_contact_id" name="corresponds_to_contact_id" value="<?php echo esc_html( $contact_id )?>" />
                         <?php if ( $contact_id ) : ?>
                             <span class="description"><a href="<?php echo esc_html( get_site_url() . '/contacts/' . $contact_id )?>" target="_blank"><?php esc_html_e( "View Contact", 'disciple_tools' ) ?></a></span>
-                        <?php else :?>
+                        <?php else : ?>
                             <span class="description"><?php esc_html_e( "Add the name of the contact record this user corresponds to.", 'disciple_tools' ) ?>
                                 <a target="_blank" href="https://disciple.tools/user-docs/getting-started-info/users/inviting-users/"><?php esc_html_e( "Learn more.", "disciple_tools" ) ?></a>
                             </span>
