@@ -204,8 +204,8 @@ class DT_Theme_Customizer {
             'dt_navbar_color' => '#3f729b',
             'dt_navbar_second_color' => '#ffffff',
             'dt_primary_button_color' => '#3f729b',
-            'dt_primary_button_text_color' => '#a8dadc',
-            'dt_tile_background_color' => '#fefefe'
+            'dt_primary_button_text_color' => '#c7d0d8',
+            'dt_tile_background_color' => '#161b22'
         ];
         $color_themes['disciple_toogles'] = [
             'dt_background_color' => '#f3f3f3',
@@ -241,7 +241,7 @@ class DT_Theme_Customizer {
         ];
         $color_themes['soft_drink_cup'] = [
             'dt_background_color' => '#ffffff',
-            'dt_background_image' => 'https://99percentinvisible.org/app/uploads/2019/07/solo-jaz.jpg',
+            'dt_background_image' => 'https://raw.githubusercontent.com/DiscipleTools/disciple-tools-theme-data/master/images/cup.jpg',
             'dt_navbar_color' => '#f72585',
             'dt_navbar_second_color' => '#05c4c6',
             'dt_primary_button_color' => '#3d0066',
@@ -250,7 +250,7 @@ class DT_Theme_Customizer {
         ];
         $color_themes['hasta_la_vista'] = [
             'dt_background_color' => '#0b090a',
-            'dt_background_image' => 'https://cdn.pixabay.com/photo/2015/09/10/14/14/scratched-934483_960_720.jpg',
+            'dt_background_image' => 'https://raw.githubusercontent.com/DiscipleTools/disciple-tools-theme-data/master/images/brushed-metal.jpg',
             'dt_navbar_color' => '#660708',
             'dt_navbar_second_color' => '#e5383b',
             'dt_primary_button_color' => '#a4161a',
@@ -274,7 +274,7 @@ class DT_Theme_Customizer {
             'dt_tile_background_color' => '#efe6dd'
         ];
         $color_themes['joy_to_the_world'] = [
-            'dt_background_color' => '#001c00',
+            'dt_background_color' => '#056005',
             'dt_navbar_color' => '#bf0603',
             'dt_navbar_second_color' => '#d1d1d1',
             'dt_primary_button_color' => '#4a4a4a',
@@ -291,7 +291,7 @@ class DT_Theme_Customizer {
         ];
         $color_themes['motel_art'] = [
             'dt_background_color' => '#68B0AB',
-            'dt_background_image' => 'https://www.wowpatterns.com/assets/files/resource_images/spring-green-leaves-background-pattern.jpg',
+            'dt_background_image' => 'https://raw.githubusercontent.com/DiscipleTools/disciple-tools-theme-data/master/images/leaves.jpg',
             'dt_navbar_color' => '#645b47',
             'dt_navbar_second_color' => '#d1d1c1',
             'dt_primary_button_color' => '#7eb89f',
@@ -300,7 +300,7 @@ class DT_Theme_Customizer {
         ];
         $color_themes['viva_la_raza'] = [
             'dt_background_color' => '#56d69f',
-            'dt_background_image' => 'https://cdn.pixabay.com/photo/2016/11/15/23/14/emerald-1827808_1280.jpg',
+            'dt_background_image' => 'https://raw.githubusercontent.com/DiscipleTools/disciple-tools-theme-data/master/images/cloth.jpg',
             'dt_navbar_color' => '#ee4266',
             'dt_navbar_second_color' => '#ffd23f',
             'dt_primary_button_color' => '#540d6e',
