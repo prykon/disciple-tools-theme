@@ -61,7 +61,6 @@ class DT_Theme_Customizer {
                 'routing_thomas' => 'Routing Thomas',
                 'motel_art' => 'Motel Art',
                 'viva_la_raza' => '¡Viva la Raza!',
-                'africa_forever' => 'Africa Forever',
                 'custom' => '(Custom)',
                 )
             )
@@ -306,14 +305,6 @@ class DT_Theme_Customizer {
             'dt_primary_button_color' => '#540d6e',
             'dt_primary_button_text_color' => '#3bceac',
             'dt_tile_background_color' => '#eae2b7'
-        ];
-        $color_themes['africa_forever'] = [
-            'dt_background_color' => '#463756',
-            'dt_navbar_color' => '#C54125',
-            'dt_navbar_second_color' => '#E36E0D',
-            'dt_primary_button_color' => '#514C48',
-            'dt_primary_button_text_color' => '#F3D28F',
-            'dt_tile_background_color' => '#F3D28F'
         ];
         ?>
         <style id="dt-custom-css">
