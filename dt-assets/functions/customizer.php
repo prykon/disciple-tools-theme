@@ -346,7 +346,7 @@ class DT_Theme_Customizer {
                 filter: brightness(0.75);
             }
             #top-bar-menu .dropdown.menu .is-submenu-item a:hover {
-                background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_navbar_second_color'] ); ?>;
+                background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>;
             }
             #top-bar-menu .top-bar-left .dropdown.menu a:hover {
                 background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>;
@@ -420,6 +420,10 @@ class DT_Theme_Customizer {
             input:checked~.switch-paddle { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>; }
             input.dt-switch:checked+label { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>; }
             thead{ border: none; }
+            .accordion-menu .is-accordion-submenu-parent:not(.has-submenu-toggle)>a:after { border-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?> transparent transparent; }
+            .dropdown.menu>li.is-dropdown-submenu-parent>a:after { border-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?> transparent transparent; }
+            .top-bar-left { margin-bottom: -1px; }
+
         </style>
         <?php
     }
