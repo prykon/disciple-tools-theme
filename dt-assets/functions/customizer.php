@@ -304,6 +304,10 @@ class DT_Theme_Customizer {
             return;
         }
 
+        if ( $selected_color_theme == 'dark_mode' ) {
+            self::load_dark_theme();
+            return;
+        }
         ?>
         <style id="dt-custom-css">
             .logo-link {
@@ -410,6 +414,126 @@ class DT_Theme_Customizer {
             input:checked~.switch-paddle { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>; }
             input.dt-switch:checked+label { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>; }
             thead{ border: none; }
+            .accordion-menu .is-accordion-submenu-parent:not(.has-submenu-toggle)>a:after { border-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?> transparent transparent; }
+            .dropdown.menu>li.is-dropdown-submenu-parent>a:after { border-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?> transparent transparent; }
+            .top-bar-left { margin-bottom: -1px; }
+        </style>
+        <?php
+    }
+
+    public function load_dark_theme() {
+        ?>
+        <style id="dt-custom-css">
+            .logo-link {
+                background-image: url( <?php echo esc_attr( $color_themes[$selected_color_theme]['custom_logo'] ); ?> );
+                background-size: contain;
+                background-repeat: no-repeat;
+                margin-right: 20px;
+            }
+            body {
+                background-color: #0d1117;
+                background-attachment: fixed;
+                background-size: cover;
+                color: #848c96;
+            }
+            .top-bar { 
+                background-color: #30363d;
+                border-color: #30363d;
+            }
+            .top-bar ul { background-color: #30363d; }
+            .title-bar { background-color: #30363d; }
+            #top-bar-menu .dropdown.menu a {
+                background-color: #30363d;
+                color: #c4cbd3;
+            }
+            .dropdown.menu>li.is-active>a { color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>;  }
+            #top-bar-menu .dropdown.menu li.active>a {
+                background-color: #30363d;
+                color: #c4cbd3;
+                filter: brightness(0.75);
+            }
+            #top-bar-menu .dropdown.menu .is-submenu-item a:hover {
+                background-color: #161c22;
+            }
+            #top-bar-menu .top-bar-left .dropdown.menu a:hover {
+                background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>;
+            }
+            nav.second-bar { background-color: #0d1117; ?> }
+            .list_field_picker { background-color: #0d1117; ?> !important }
+            #bulk_edit_picker { background-color: #0d1117; ?> !important }
+            .button {
+                background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>;
+                color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_text_color'] ); ?>;
+            }
+            .button.select-button { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>50; }
+            .button.select-button:hover { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>75; }
+            .button.selected-select-button { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>; }
+            .button.clear{ color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>; }
+            .button.hollow {
+                border-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>;
+                color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>;
+            }
+            .button:hover { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>75; }
+            .list-views label { color: #848c96; }
+            .list-views label:hover { color: #c4cbd3; }
+            #table-content tr:hover { background-color: #30363d;  }
+            .typeahead__label {
+                background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>15;
+                border-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>50;
+            }
+            .typeahead__label .typeahead__cancel-button:hover { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>25; }
+            .show-details-section { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>15 !important; }
+            .typeahead__cancel-button { border-left: 1px solid <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>50 !important; }
+            .current-filter{
+                background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>30;
+                border-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>;
+            }
+            .section-header { color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>; }
+            .bordered-box {
+                background-color: #0d1117;
+                border-color: #30353d;
+            }
+            .callout { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_tile_background_color'] ); ?>; }
+            .left-border-grey { border-left: 1px solid <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>75; }
+            tbody {
+                background-color: #0d1117;
+                border: 1px solid #30353d;
+                color: #848c96;
+            }
+            tbody>tr {
+                background-color: #0d1117;
+                border-bottom: 1px solid #30353d;
+                color: #848c96;
+            }
+            .mentions-input-box { background-color: #0d1117; }
+            .cell.auto { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_tile_background_color'] ); ?>; }
+            #add-comment-section{ border-color: #30353d !important; }
+            .tabs-content { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_tile_background_color'] ); ?>; }
+            .dropdown.menu>li>a {
+                background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_tile_background_color'] ); ?>;
+            }
+            a { color: #c4cbd3; }
+            a:hover { color: #0d1117; }
+            .accordion-title{
+                background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?> !important;
+                color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_text_color'] ); ?> !important;
+                opacity: 0.75;
+                border: none;
+            }
+            .day-activities__title { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?> }
+            .activity__more-link { color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?> }
+            .is-active a{filter: none;}
+            .accordion-content{
+                background-color: #0d1117;
+                border: none;
+                color: #848c96;
+            }
+            input:checked~.switch-paddle { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>; }
+            input.dt-switch:checked+label { background-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?>; }
+            thead{
+                color: #848c96;
+                border: none;
+            }
             .accordion-menu .is-accordion-submenu-parent:not(.has-submenu-toggle)>a:after { border-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?> transparent transparent; }
             .dropdown.menu>li.is-dropdown-submenu-parent>a:after { border-color: <?php echo esc_attr( $color_themes[$selected_color_theme]['dt_primary_button_color'] ); ?> transparent transparent; }
             .top-bar-left { margin-bottom: -1px; }
