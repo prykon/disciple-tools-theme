@@ -194,4 +194,8 @@
             }
             .typeahead__label .typeahead__cancel-button { border-left:  1px solid #848c96; }
             .typeahead__label .typeahead__cancel-button:hover { background-color: #848c96 }
+            .tabs-panel.is-active { background-color: #010408; }
+            #filter-modal .filter-modal-left { background-color: #161c22; }
+            [data-filter="my_subassigned"] img { filter: invert(56%) sepia(23%) saturate(153%) hue-rotate(174deg) brightness(93%) contrast(92%) !important; }
+            [data-filter="my_shared"] img { filter: invert(56%) sepia(23%) saturate(153%) hue-rotate(174deg) brightness(93%) contrast(92%) !important; }
         </style>
