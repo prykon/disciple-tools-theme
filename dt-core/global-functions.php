@@ -760,6 +760,242 @@ if ( ! defined( 'DT_FUNCTIONS_READY' ) ){
                             write_input_widget()
                         })
                     </script>
+                    <script>
+                        var phone_input = jQuery( '#edit-contact_phone input');
+                        country_code_flag = [];
+                        country_code_flag[1] = 'US';
+                        country_code_flag[20] = 'EG';
+                        country_code_flag[211] = 'SS';
+                        country_code_flag[212] = 'EH';
+                        country_code_flag[213] = 'DZ';
+                        country_code_flag[216] = 'TN';
+                        country_code_flag[218] = 'LY';
+                        country_code_flag[220] = 'GM';
+                        country_code_flag[221] = 'SN';
+                        country_code_flag[222] = 'MR';
+                        country_code_flag[223] = 'ML';
+                        country_code_flag[224] = 'GN';
+                        country_code_flag[225] = 'CI';
+                        country_code_flag[226] = 'BF';
+                        country_code_flag[227] = 'NE';
+                        country_code_flag[228] = 'TG';
+                        country_code_flag[229] = 'BJ';
+                        country_code_flag[230] = 'MU';
+                        country_code_flag[231] = 'LR';
+                        country_code_flag[232] = 'SL';
+                        country_code_flag[233] = 'GH';
+                        country_code_flag[234] = 'NG';
+                        country_code_flag[235] = 'TD';
+                        country_code_flag[236] = 'CF';
+                        country_code_flag[237] = 'CM';
+                        country_code_flag[238] = 'CV';
+                        country_code_flag[239] = 'ST';
+                        country_code_flag[240] = 'GQ';
+                        country_code_flag[241] = 'GA';
+                        country_code_flag[242] = 'CG';
+                        country_code_flag[243] = 'CD';
+                        country_code_flag[244] = 'AO';
+                        country_code_flag[245] = 'GW';
+                        country_code_flag[246] = 'IO';
+                        country_code_flag[247] = 'AC';
+                        country_code_flag[248] = 'SC';
+                        country_code_flag[249] = 'SD';
+                        country_code_flag[250] = 'RW';
+                        country_code_flag[251] = 'ET';
+                        country_code_flag[252] = 'SO';
+                        country_code_flag[253] = 'DJ';
+                        country_code_flag[254] = 'KE';
+                        country_code_flag[255] = 'TZ';
+                        country_code_flag[256] = 'UG';
+                        country_code_flag[257] = 'BI';
+                        country_code_flag[258] = 'MZ';
+                        country_code_flag[260] = 'ZM';
+                        country_code_flag[261] = 'MG';
+                        country_code_flag[262] = 'YT';
+                        country_code_flag[263] = 'ZW';
+                        country_code_flag[264] = 'NA';
+                        country_code_flag[265] = 'MW';
+                        country_code_flag[266] = 'LS';
+                        country_code_flag[267] = 'BW';
+                        country_code_flag[268] = 'SZ';
+                        country_code_flag[269] = 'KM';
+                        country_code_flag[27] = 'ZA';
+                        country_code_flag[290] = 'TA';
+                        country_code_flag[291] = 'ER';
+                        country_code_flag[297] = 'AW';
+                        country_code_flag[298] = 'FO';
+                        country_code_flag[299] = 'GL';
+                        country_code_flag[30] = 'GR';
+                        country_code_flag[31] = 'NL';
+                        country_code_flag[32] = 'BE';
+                        country_code_flag[33] = 'FR';
+                        country_code_flag[34] = 'ES';
+                        country_code_flag[350] = 'GI';
+                        country_code_flag[351] = 'PT';
+                        country_code_flag[352] = 'LU';
+                        country_code_flag[353] = 'IE';
+                        country_code_flag[354] = 'IS';
+                        country_code_flag[355] = 'AL';
+                        country_code_flag[356] = 'MT';
+                        country_code_flag[357] = 'CY';
+                        country_code_flag[358] = 'AX';
+                        country_code_flag[359] = 'BG';
+                        country_code_flag[36] = 'HU';
+                        country_code_flag[370] = 'LT';
+                        country_code_flag[371] = 'LV';
+                        country_code_flag[372] = 'EE';
+                        country_code_flag[373] = 'MD';
+                        country_code_flag[374] = 'AM';
+                        country_code_flag[375] = 'BY';
+                        country_code_flag[376] = 'AD';
+                        country_code_flag[377] = 'MC';
+                        country_code_flag[378] = 'SM';
+                        country_code_flag[380] = 'UA';
+                        country_code_flag[381] = 'RS';
+                        country_code_flag[382] = 'ME';
+                        country_code_flag[383] = 'XK';
+                        country_code_flag[385] = 'HR';
+                        country_code_flag[386] = 'SI';
+                        country_code_flag[387] = 'BA';
+                        country_code_flag[389] = 'MK';
+                        country_code_flag[39] = 'VA';
+                        country_code_flag[40] = 'RO';
+                        country_code_flag[41] = 'CH';
+                        country_code_flag[420] = 'CZ';
+                        country_code_flag[421] = 'SK';
+                        country_code_flag[423] = 'LI';
+                        country_code_flag[43] = 'AT';
+                        country_code_flag[45] = 'DK';
+                        country_code_flag[46] = 'SE';
+                        country_code_flag[47] = 'SJ';
+                        country_code_flag[48] = 'PL';
+                        country_code_flag[49] = 'DE';
+                        country_code_flag[500] = 'FK';
+                        country_code_flag[501] = 'BZ';
+                        country_code_flag[502] = 'GT';
+                        country_code_flag[503] = 'SV';
+                        country_code_flag[504] = 'HN';
+                        country_code_flag[505] = 'NI';
+                        country_code_flag[506] = 'CR';
+                        country_code_flag[507] = 'PA';
+                        country_code_flag[508] = 'PM';
+                        country_code_flag[509] = 'HT';
+                        country_code_flag[51] = 'PE';
+                        country_code_flag[52] = 'MX';
+                        country_code_flag[53] = 'CU';
+                        country_code_flag[54] = 'AR';
+                        country_code_flag[55] = 'BR';
+                        country_code_flag[56] = 'CL';
+                        country_code_flag[57] = 'CO';
+                        country_code_flag[58] = 'VE';
+                        country_code_flag[591] = 'BO';
+                        country_code_flag[592] = 'GY';
+                        country_code_flag[593] = 'EC';
+                        country_code_flag[594] = 'GF';
+                        country_code_flag[595] = 'PY';
+                        country_code_flag[596] = 'MQ';
+                        country_code_flag[597] = 'SR';
+                        country_code_flag[598] = 'UY';
+                        country_code_flag[599] = 'BQ';
+                        country_code_flag[60] = 'MY';
+                        country_code_flag[62] = 'ID';
+                        country_code_flag[63] = 'PH';
+                        country_code_flag[64] = 'NZ';
+                        country_code_flag[65] = 'SG';
+                        country_code_flag[66] = 'TH';
+                        country_code_flag[670] = 'TL';
+                        country_code_flag[672] = 'NF';
+                        country_code_flag[673] = 'BN';
+                        country_code_flag[674] = 'NR';
+                        country_code_flag[675] = 'PG';
+                        country_code_flag[676] = 'TO';
+                        country_code_flag[677] = 'SB';
+                        country_code_flag[678] = 'VU';
+                        country_code_flag[679] = 'FJ';
+                        country_code_flag[680] = 'PW';
+                        country_code_flag[681] = 'WF';
+                        country_code_flag[682] = 'CK';
+                        country_code_flag[683] = 'NU';
+                        country_code_flag[685] = 'WS';
+                        country_code_flag[686] = 'KI';
+                        country_code_flag[687] = 'NC';
+                        country_code_flag[688] = 'TV';
+                        country_code_flag[689] = 'PF';
+                        country_code_flag[690] = 'TK';
+                        country_code_flag[691] = 'FM';
+                        country_code_flag[692] = 'MH';
+                        country_code_flag[7] = 'KZ';
+                        country_code_flag[81] = 'JP';
+                        country_code_flag[82] = 'KR';
+                        country_code_flag[84] = 'VN';
+                        country_code_flag[850] = 'KP';
+                        country_code_flag[852] = 'HK';
+                        country_code_flag[853] = 'MO';
+                        country_code_flag[855] = 'KH';
+                        country_code_flag[856] = 'LA';
+                        country_code_flag[86] = 'CN';
+                        country_code_flag[880] = 'BD';
+                        country_code_flag[886] = 'TW';
+                        country_code_flag[90] = 'TR';
+                        country_code_flag[91] = 'IN';
+                        country_code_flag[92] = 'PK';
+                        country_code_flag[93] = 'AF';
+                        country_code_flag[94] = 'LK';
+                        country_code_flag[95] = 'MM';
+                        country_code_flag[960] = 'MV';
+                        country_code_flag[961] = 'LB';
+                        country_code_flag[962] = 'JO';
+                        country_code_flag[963] = 'SY';
+                        country_code_flag[964] = 'IQ';
+                        country_code_flag[965] = 'KW';
+                        country_code_flag[966] = 'SA';
+                        country_code_flag[967] = 'YE';
+                        country_code_flag[968] = 'OM';
+                        country_code_flag[970] = 'PS';
+                        country_code_flag[971] = 'AE';
+                        country_code_flag[972] = 'IL';
+                        country_code_flag[973] = 'BH';
+                        country_code_flag[974] = 'QA';
+                        country_code_flag[975] = 'BT';
+                        country_code_flag[976] = 'MN';
+                        country_code_flag[977] = 'NP';
+                        country_code_flag[98] = 'IR';
+                        country_code_flag[992] = 'TJ';
+                        country_code_flag[993] = 'TM';
+                        country_code_flag[994] = 'AZ';
+                        country_code_flag[995] = 'GE';
+                        country_code_flag[996] = 'KG';
+                        country_code_flag[998] = 'UZ';
+
+                        function getFlagEmoji(countryCode) {
+                        const codePoints = countryCode
+                            .toUpperCase()
+                            .split('')
+                            .map(char =>  127397 + char.charCodeAt());
+                        return String.fromCodePoint(...codePoints);
+                        }
+
+                        var current_flag_code = '';
+                        var country_code_regex = new RegExp(/\+\d+[\s|\-].*?/);
+                        
+                        phone_input.keyup( function() {
+                            if ( country_code_regex.test( phone_input.val() ) ) {
+                                var phone_country_code = phone_input.val().match( /\+(\d+)[\s|\-].*?/ )[1];
+                                var new_phone_input = $(this).val();
+                                new_phone_input = new_phone_input.match( /^.*?(\+.*$)/ )[1];
+                                
+                                if ( current_flag_code !== country_code_flag[phone_country_code] ) {
+                                    if ( country_code_flag[phone_country_code] ) {
+                                        current_flag_code = country_code_flag[phone_country_code];
+                                        var flag_emoji = getFlagEmoji(current_flag_code);
+                                        $(this).val( flag_emoji + ' ' + new_phone_input );
+                                    } else {
+                                        $(this).val( '⚠️ ' + new_phone_input );
+                                    }
+                                }
+                            }
+                        });
+                    </script>
                 <?php elseif ( DT_Mapbox_API::get_key() ) : // test if Mapbox key is present ?>
                     <div id="mapbox-wrapper"></div>
                 <?php endif; ?>
@@ -800,7 +1036,11 @@ if ( ! defined( 'DT_FUNCTIONS_READY' ) ){
                             <input type="text"
                                     <?php echo esc_html( $required_tag ) ?>
                                    data-field="<?php echo esc_html( $field_key ) ?>"
-                                   class="dt-communication-channel input-group-field" dir="auto" <?php echo esc_html( $disabled ); ?>/>
+                                   class="dt-communication-channel input-group-field" dir="auto" <?php echo esc_html( $disabled ); ?>
+                                   <?php if ( $field_key === 'contact_phone' ) : ?>
+                                    value="+"
+                                    <?php endif; ?>
+                                   />
                         </div>
                     <?php endif ?>
                 </div>
