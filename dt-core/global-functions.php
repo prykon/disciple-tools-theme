@@ -761,7 +761,6 @@ if ( ! defined( 'DT_FUNCTIONS_READY' ) ){
                         })
                     </script>
                     <script>
-                        var phone_input = jQuery( '#edit-contact_phone input');
                         country_code_flag = [];
                         country_code_flag[1] = 'US';
                         country_code_flag[20] = 'EG';
@@ -968,13 +967,11 @@ if ( ! defined( 'DT_FUNCTIONS_READY' ) ){
                         country_code_flag[998] = 'UZ';
 
                         function getFlagEmoji(countryCode) {
-                        const codePoints = countryCode
-                            .toUpperCase()
-                            .split('')
-                            .map(char =>  127397 + char.charCodeAt());
-                        return String.fromCodePoint(...codePoints);
+                            const codePoints = countryCode.toUpperCase().split('').map(char =>  127397 + char.charCodeAt());
+                            return String.fromCodePoint(...codePoints);
                         }
 
+                        var phone_input = jQuery( '#edit-contact_phone input' );
                         var current_flag_code = '';
                         var country_code_regex = new RegExp(/\+\d+[\s|\-].*?/);
                         
