@@ -25,9 +25,9 @@ function dt_release_modal() {
         $last_release_notification = '1.0.0';
     }
 
-    if ( version_compare( $last_release_notification, $show_notification_for_theme_version, '>=' ) ){
-        return;
-    }
+    // if ( version_compare( $last_release_notification, $show_notification_for_theme_version, '>=' ) ){
+    //     return;
+    // }
     require_once( get_template_directory().'/dt-core/libraries/parsedown/Parsedown.php' );
 
     update_user_meta( get_current_user_id(), 'dt_release_notification', $show_notification_for_theme_version );
