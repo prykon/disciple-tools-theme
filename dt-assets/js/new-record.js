@@ -632,6 +632,11 @@ jQuery(function($) {
       // If enabled, alter mapbox search location input shape, within first record
       alter_mapbox_search_location_input_shape($('#form_fields_records').find('.form-fields-record').last());
 
+      var location_autosuggest = $('#location_autosuggest');
+      location_autosuggest.on('click', function() {
+        alert('fooooobar');
+      });
+
       // Default to currently selected contact type.
       let selected_contact_type = $('.type-option.selected').attr('id');
       $('#' + selected_contact_type + '.type-option').trigger('click');
@@ -828,6 +833,41 @@ jQuery(function($) {
   });
 
   $(document).on('closed.zf.reveal', '[data-reveal]', function (evt) {
+  });
+
+  $(document).on('click', '#location_autosuggest', function() {
+    alert('No mapbox key present Foobar code goes here.');
+  });
+
+  // Assign location from autosuggest link from mapbox
+  $(document).on('click', '#location_autosuggest_mapbox', function() {
+    var country_name = $('#location_autosuggest_mapbox').data('country_name');
+    $('#mapbox-search').val(country_name);
+    $('#phone-location-label').hide();
+    let root = 'https://api.mapbox.com/geocoding/v5/mapbox.places/'
+    let settings = '.json?types=country&limit=1&access_token='
+    let key = dtMapbox.map_key
+    let url = root + encodeURI( country_name ) + settings + key
+    jQuery.get( url, function( data ) {
+      if( data.features.length < 1 ) {
+        console.log('no results');
+        return
+      }
+      window.location_data = {
+        location_grid_meta: {
+          values: [
+            {
+              lng: data.features[0]['geometry']['coordinates'][0],
+              lat: data.features[0]['geometry']['coordinates'][1],
+              level: convert_level( data.features[0]['place_type'][0] ),
+              label: data.features[0]['place_name'],
+              source: 'user'
+            }
+          ]
+        }
+      };
+      window.selected_location_grid_meta = window.location_data;
+    })
   });
 
   $('#altered_mapbox_search_modal_but_cancel').on('click', function () {
@@ -1372,3 +1412,8 @@ jQuery(function($) {
    */
 
 });
+
+// function assign_autosuggested_location(country_name, grid_id) {
+//       $('#mapbox-search').val(country_name);
+//       $('#phone-location-label').hide();
+//     }
