@@ -611,7 +611,40 @@ jQuery(function($) {
     }
     new_post[field].values.push({value: tag})
     Typeahead['.js-typeahead-' + field].addMultiselectItemLayout({value: tag})
-  })
+  });
+
+
+  $(document).on('click', '#location_autosuggest', function() {
+    var country_name = $('#location_autosuggest').data('country_name');
+    $('#location_grid_t input').val(country_name);
+    $('#phone-location-label').hide();
+    var url = window.wpApiShare.root + 'dt/v1/mapping_module/search_location_grid_by_name';
+    
+    $.ajax( {
+      type: "GET",
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      url: url,
+      data: {
+        s: country_name,
+      },
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader('X-WP-Nonce', window.wpApiShare.nonce);
+      },
+      callback: {
+        done: function(data) {
+          if ( data.location_grid.length < 1 ) {
+            console.log('no results');
+            return;
+          }
+          console.log(data.location_grid);
+          // TODO: add data.location_grid.id to submitted object
+          // Add location to input box with the proper look & feel and functionality
+        }
+      }
+    });
+  });
+
 
   /**
    * ============== [ BULK RECORD ADDING FUNCTIONALITY ] ==============
@@ -835,23 +868,19 @@ jQuery(function($) {
   $(document).on('closed.zf.reveal', '[data-reveal]', function (evt) {
   });
 
-  $(document).on('click', '#location_autosuggest', function() {
-    alert('No mapbox key present Foobar code goes here.');
-  });
-
   // Assign location from autosuggest link from mapbox
   $(document).on('click', '#location_autosuggest_mapbox', function() {
     var country_name = $('#location_autosuggest_mapbox').data('country_name');
     $('#mapbox-search').val(country_name);
     $('#phone-location-label').hide();
-    let root = 'https://api.mapbox.com/geocoding/v5/mapbox.places/'
-    let settings = '.json?types=country&limit=1&access_token='
-    let key = dtMapbox.map_key
-    let url = root + encodeURI( country_name ) + settings + key
+    var root = 'https://api.mapbox.com/geocoding/v5/mapbox.places/'
+    var settings = '.json?types=country&limit=1&access_token='
+    var key = dtMapbox.map_key
+    var url = root + encodeURI( country_name ) + settings + key
     jQuery.get( url, function( data ) {
       if( data.features.length < 1 ) {
         console.log('no results');
-        return
+        return;
       }
       window.location_data = {
         location_grid_meta: {
