@@ -813,6 +813,11 @@ class DT_Posts extends Disciple_Tools_Posts {
             }
         }
 
+        /**
+         * Empty Search String
+         * Return the most recent posts viewed by the user
+         * and recently chosen value for this field
+         */
         $send_quick_results = false;
         if ( empty( $search_string ) ){
             $field_settings = self::get_post_field_settings( $post_type );
@@ -877,11 +882,16 @@ class DT_Posts extends Disciple_Tools_Posts {
             }
         }
 
+
+        /**
+         * Use the search string to find connections
+         */
         if ( !$send_quick_results ){
             $query = [ 'limit' => 50 ];
             if ( !empty( $search_string ) ){
                 $query['name'] = [ $search_string ];
             }
+            $query = apply_filters( 'dt_get_viewable_compact_search_query', $query, $post_type, $search_string, $args );
             // if user can't list_all_, check permissions so they don't get access to things they shouldn't
             $check_permissions = !self::can_list_all( $post_type );
             $posts_list = self::search_viewable_post( $post_type, $query, $check_permissions );
@@ -1557,17 +1567,24 @@ class DT_Posts extends Disciple_Tools_Posts {
                         $meta = [];
                         if ( $field_type === 'communication_channel' ) {
                             $meta = [
-                                'meta_key' => $activity->meta_key
+                                'meta_key' => $activity->meta_key,
+                                'value_key_prefix' => $activity->meta_key . '-'
                             ];
                         }elseif ( $field_type === 'link' ) {
                             $meta = [
-                                'meta_id' => $activity->meta_id
+                                'meta_id' => $activity->meta_id,
+                                'value_key_prefix' => $activity->meta_id . '-'
+                            ];
+                        } elseif ( $field_type === 'location' ){
+                            $meta = [
+                                'meta_id' => $activity->meta_id,
+                                'value_key_prefix' => $activity->meta_id . '-'
                             ];
                         }
 
                         // Proceed with capturing reverted updates.
                         $value = $is_deleted ? $field_old_value : $field_value;
-                        $reverted_updates[$field_key]['values'][$value] = [
+                        $reverted_updates[$field_key]['values'][( $meta['value_key_prefix'] ?? '' ) . $value] = [
                             'value' => $value,
                             'keep' => $is_deleted,
                             'note' => $field_note_raw,
@@ -1576,9 +1593,9 @@ class DT_Posts extends Disciple_Tools_Posts {
 
                         // Ensure any detected old values are reinstated!
                         if ( !$is_deleted && !empty( $field_old_value ) ){
-                            unset( $reverted_updates[$field_key]['values'][$field_value] );
+                            unset( $reverted_updates[$field_key]['values'][( $meta['value_key_prefix'] ?? '' ) . $field_value] );
 
-                            $reverted_updates[$field_key]['values'][$field_old_value] = [
+                            $reverted_updates[$field_key]['values'][( $meta['value_key_prefix'] ?? '' ) . $field_old_value] = [
                                 'value' => $field_old_value,
                                 'keep' => true,
                                 'note' => $field_note_raw,
@@ -1659,6 +1676,11 @@ class DT_Posts extends Disciple_Tools_Posts {
                     $values = [];
                     foreach ( $reverted['values'] as $revert_key => $revert_obj ){
 
+                        // Remove any detected revert value key prefixes.
+                        if ( isset( $revert_obj['meta'], $revert_obj['meta']['value_key_prefix'] ) && strpos( $revert_key, $revert_obj['meta']['value_key_prefix'] ) !== false ){
+                            $revert_key = substr( $revert_key, strlen( $revert_obj['meta']['value_key_prefix'] ) );
+                        }
+
                         // Keep existing values or add if needed.
                         if ( $revert_obj['keep'] ){
                             $found_existing_option = false;
@@ -1728,7 +1750,7 @@ class DT_Posts extends Disciple_Tools_Posts {
                                     ];
                                 } elseif ( $reverted['field_type'] == 'link' ) {
                                     $values[] = [
-                                        'meta_id' => $revert_obj['meta']['meta_id'] ?? null,
+                                        'type' => 'default',
                                         'value' => $revert_obj['value']
                                     ];
                                 } else {
